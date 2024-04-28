@@ -1,2 +1,0 @@
-person(id, name, surname)
-book(isbn, book, year, author)

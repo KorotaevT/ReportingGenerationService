@@ -59,31 +59,44 @@ const Dashboard = () => {
       </div>
       {tableData && (
         <div>
-          {tableData.map((table, index) => (
-            <div key={index}>
-              <h3>{table.tableName}</h3>
-              <Table striped bordered hover>
-                <thead>
-                  <tr>
-                    {Object.keys(table.data).map((key) => (
-                      <th key={key}>{key}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    {Object.values(table.data).map((valueArray, index) => (
-                      <td key={index}>
-                        {valueArray.map((value, index) => (
-                          <div key={index}>{value}</div>
-                        ))}
-                      </td>
-                    ))}
-                  </tr>
-                </tbody>
-              </Table>
-            </div>
-          ))}
+          {Array.from(new Set(tableData.map((table) => table.dbName))).map(
+            (dbName) => (
+              <div key={dbName}>
+                <h2>{dbName}</h2>
+                {tableData
+                  .filter((table) => table.dbName === dbName)
+                  .map((table, index) => (
+                    <div key={index}>
+                      <h3>{table.tableName}</h3>
+                      <Table striped bordered hover>
+                        <thead>
+                          <tr>
+                            {Object.keys(table.data).map((key) => (
+                              <th key={key}>{key}</th>
+                            ))}
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            {Object.values(table.data).map(
+                              (valueArray, index) => (
+                                <td key={index}>
+                                  {valueArray.map((value, index) => (
+                                    <div key={index}>
+                                      {value === "" ? <>&nbsp;</> : value}
+                                    </div>
+                                  ))}
+                                </td>
+                              )
+                            )}
+                          </tr>
+                        </tbody>
+                      </Table>
+                    </div>
+                  ))}
+              </div>
+            )
+          )}
         </div>
       )}
     </div>

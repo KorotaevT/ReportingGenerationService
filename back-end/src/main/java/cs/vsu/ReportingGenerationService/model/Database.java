@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Entity
 @Table(name="database")
 @Data
@@ -26,4 +28,6 @@ public class Database {
 
     private String password;
 
+    @OneToMany(mappedBy = "database")
+    private List<Tables> tables;
 }
