@@ -58,6 +58,28 @@ public class DynamicTableReader {
         return tablesData;
     }
 
+    public List<Map<String, Map<String, Map<String, List<Object>>>>> getDbStructure() {
+
+        List<Database> databases = databaseRepository.findAll();
+        List<Map<String, Map<String, Map<String, List<Object>>>>> tablesData = new ArrayList<>();
+
+        for (Database database : databases) {
+            List<Tables> tables = database.getTables();
+            Map<String, Map<String, Map<String, List<Object>>>> dbTablesData = new LinkedHashMap<>();
+            Map<String, Map<String, List<Object>>> tableMap = new LinkedHashMap<>();
+            for (Tables table : tables) {
+                List<String> columnNames = getColumnNamesFromDefinition(table.getFields());
+                List<List<Object>> rows = new ArrayList<>();
+                Map<String, List<Object>> tableData = createTableDataWithColumnNames(columnNames, rows);
+                tableMap.put(table.getName(), tableData);
+            }
+            dbTablesData.put(database.getName(), tableMap);
+            tablesData.add(dbTablesData);
+        }
+
+        return tablesData;
+    }
+
     private static Map<String, List<Object>> createTableDataWithColumnNames(List<String> columnNames, List<List<Object>> rows) {
         Map<String, List<Object>> tableData = new LinkedHashMap<>();
 

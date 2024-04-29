@@ -18,23 +18,23 @@ function App() {
   const user = useUser();
 
   useEffect(() => {
+    const getRolesFromJwt = () => {
+      if (user.jwt) {
+        const decodeJwt = jwtDecode(user.jwt);
+        return decodeJwt.authorities;
+      }
+    };
+  
     setRoles(getRolesFromJwt());
-}, [user.jwt]);
-
-
-  function getRolesFromJwt() {
-    if (user.jwt) {
-      const decodeJwt = jwtDecode(user.jwt);
-      return decodeJwt.authorities;
-    }
-  }
+  }, [user.jwt]);
+  
 
   return (
     <Routes>
       <Route
         path="/dashboard"
         element={
-          roles && roles.find((role) => role === "REVIEWER") ? (
+          roles && roles.find((role) => role === "ADMIN") ? (
             <PrivateRoute>
               <CodeReviwerDashboard />
             </PrivateRoute>
@@ -48,7 +48,7 @@ function App() {
       <Route
         path="/assignments/:assignmentId"
         element={
-          roles && roles.find((role) => role === "REVIEWER") ? (
+          roles && roles.find((role) => role === "ADMIN") ? (
             <PrivateRoute>
               <CodeReviewerAssignmentView />
             </PrivateRoute>

@@ -58,3 +58,25 @@
   padding: 1em;
   margin: 1em 0em;
 }
+
+.paper-container {
+  position: relative;
+  margin: 0 auto;
+  width: 21cm; /* Ширина листа А4 */
+  max-width: 100%; /* Максимальная ширина, чтобы соответствовать родительскому элементу */
+  height: 29.7cm; /* Высота листа А4 */
+  max-height: 100%; /* Максимальная высота, чтобы соответствовать родительскому элементу */
+  padding: 1cm; /* Отступы, как у листа А4 */
+  box-sizing: border-box; /* Чтобы padding не влиял на ширину и высоту */
+  background-color: white; /* Цвет фона, как у листа А4 */
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1); /* Тень для эффекта окошка */
+  overflow: auto; /* Прокрутка контента при превышении размеров листа А4 */
+}
+
+.page-number {
+  position: absolute;
+  top: 0.5cm;
+  right: 1cm;
+  font-size: 0.8em;
+}
+
