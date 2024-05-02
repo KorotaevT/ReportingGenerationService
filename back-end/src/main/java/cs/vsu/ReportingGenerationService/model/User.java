@@ -24,7 +24,7 @@ public class User implements UserDetails {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private LocalDate cohortStartDate;
+    private LocalDate registrationDate;
     private String username;
     @JsonIgnore
     private String password;

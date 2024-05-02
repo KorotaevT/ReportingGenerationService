@@ -3,11 +3,12 @@ import "./App.css";
 import { Route, Routes } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import Dashboard from "./Dashboard";
-import CodeReviwerDashboard from "./CodeReviewerDashboard";
+import AdminDashboard from "./AdminDashboard";
 import Homepage from "./Homepage";
 import Login from "./Login";
 import PrivateRoute from "./PrivateRoute";
 import AssignmentView from "./AssignmentView";
+import AdminPanelRequests from "./AdminPanelRequests"
 import "bootstrap/dist/css/bootstrap.min.css";
 import CodeReviewerAssignmentView from "./CodeReviewerAssignmentView";
 import { useUser } from "./UserProvider";
@@ -36,7 +37,7 @@ function App() {
         element={
           roles && roles.find((role) => role === "ADMIN") ? (
             <PrivateRoute>
-              <CodeReviwerDashboard />
+              <AdminDashboard />
             </PrivateRoute>
           ) : (
             <PrivateRoute>
@@ -62,6 +63,7 @@ function App() {
       <Route path="/login" element={<Login />} />
       <Route path="/" element={<Homepage />} />
       <Route path="/registration" element={<Register />} />
+      <Route path="/adminPanelRequests" element={<AdminPanelRequests/>} />
     </Routes>
   );
 }

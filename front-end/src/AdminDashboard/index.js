@@ -5,7 +5,7 @@ import { useUser } from "../UserProvider";
 import { useInterval } from "../util/useInterval";
 import validateToken from "../util/tokenValidator";
 
-const Dashboard = () => {
+const AdminDashboard = () => {
   const user = useUser();
   const navigate = useNavigate();
   const userRef = useRef(user);
@@ -41,10 +41,16 @@ const Dashboard = () => {
       <Row className="mt-1">
         <Col>
           <div className="d-flex justify-content-between align-items-center">
-            <div></div>
+            <Button
+              variant="primary"
+              onClick={() => {
+                navigateRef.current("/adminPanelRequests");
+              }}
+            >
+              Admin Panel
+            </Button>
             <Button
               variant="danger"
-              className="ml-auto"
               onClick={() => {
                 userRef.current.setJwt(null);
                 navigateRef.current("/login");
@@ -64,10 +70,12 @@ const Dashboard = () => {
         </Col>
       </Row>
       <div className="mt-4 report-wrapper report">
-        <div className="report-wrapper-title h3 px-2">Available reports</div>
+        <div className="report-wrapper-title h3 px-2">
+          Available reports
+        </div>
       </div>
     </Container>
   );
 };
 
-export default Dashboard;
+export default AdminDashboard;

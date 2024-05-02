@@ -29,7 +29,7 @@ public class AuthenticationService {
     public AuthenticationResponse register(RegisterRequest request) {
         Authority authority = new Authority(Role.GUEST);
         var user = User.builder()
-                .cohortStartDate(LocalDate.now())
+                .registrationDate(LocalDate.now())
                 .username(request.getUsername())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .authorities(List.of(authority))
