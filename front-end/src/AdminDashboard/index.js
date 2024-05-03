@@ -56,7 +56,7 @@ const AdminDashboard = () => {
                 navigateRef.current("/login");
               }}
             >
-              Logout
+              Выйти
             </Button>
           </div>
         </Col>

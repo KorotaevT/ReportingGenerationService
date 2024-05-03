@@ -1,11 +1,11 @@
 import React, { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button, Col, Row, Container } from "react-bootstrap";
+import { Button, Row, Container, Col } from "react-bootstrap";
 import { useUser } from "../UserProvider";
 import { useInterval } from "../util/useInterval";
 import validateToken from "../util/tokenValidator";
 
-const Dashboard = () => {
+const GuestDashboard = () => {
   const user = useUser();
   const navigate = useNavigate();
   const userRef = useRef(user);
@@ -36,38 +36,38 @@ const Dashboard = () => {
     }
   }, 60000);
 
+  const handleRefresh = () => {
+    window.location.reload();
+  };
+
   return (
     <Container>
-      <Row className="mt-1">
-        <Col>
-          <div className="d-flex justify-content-between align-items-center">
-            <div></div>
-            <Button
-              variant="danger"
-              className="ml-auto"
-              onClick={() => {
-                userRef.current.setJwt(null);
-                navigateRef.current("/login");
-              }}
-            >
-              Выйти
-            </Button>
+      <Row className="justify-content-center align-items-center vh-100">
+        <Col className="text-center mb-5">
+          <div className="h1">
+            Заявка отправлена. Дождитесь подтверждения регистрации.
           </div>
+          <Button
+            variant="success"
+            className="mt-3 btn-same-size mx-2"
+            onClick={handleRefresh}
+          >
+            Обновить страницу
+          </Button>
+          <Button
+            variant="danger"
+            className="mt-3 btn-same-size mx-2"
+            onClick={() => {
+              userRef.current.setJwt(null);
+              navigateRef.current("/login");
+            }}
+          >
+            Выйти
+          </Button>
         </Col>
       </Row>
-
-      <Row className="mt-2">
-        <Col>
-          <div className="h1 d-flex justify-content-center align-items-center">
-            Reporting Dashboard
-          </div>
-        </Col>
-      </Row>
-      <div className="mt-4 report-wrapper report">
-        <div className="report-wrapper-title h3 px-2">Available reports</div>
-      </div>
     </Container>
   );
 };
 
-export default Dashboard;
+export default GuestDashboard;

@@ -55,15 +55,13 @@ const Login = () => {
       }}
     >
       <MDBRow className="d-flex justify-content-center align-items-center h-100">
-
-
         <MDBCol col="12">
           <MDBCard
             className="bg-white my-5 mx-auto"
             style={{ borderRadius: "1rem", maxWidth: "500px" }}
           >
             <MDBCardBody className="p-5 w-100 d-flex flex-column">
-              <h2 className="fw-bold mb-2 text-center">Registration</h2>
+              <h2 className="fw-bold mb-2 text-center">Регистрация</h2>
               <p className="text-white-50 mb-3">
                 Please enter your login and password!
               </p>
@@ -73,7 +71,7 @@ const Login = () => {
                 type="text"
                 size="lg"
                 value={username}
-                placeholder="Enter your name"
+                placeholder="Введите ваше ФИО"
                 onChange={(event) => setUsername(event.target.value)}
               />
               <MDBInput
@@ -81,7 +79,7 @@ const Login = () => {
                 type="password"
                 size="lg"
                 value={password}
-                placeholder="Enter your password"
+                placeholder="Введите пароль"
                 onChange={(event) => setPassword(event.target.value)}
               />
 
@@ -91,23 +89,25 @@ const Login = () => {
                 type="button"
                 onClick={() => sendRegisterRequest()}
               >
-                Create account
+                Создать аккаунт
               </Button>
 
               <p className="text-center" style={{ marginTop: "20px" }}>
-              Already have an account?{" "}
+                Уже есть аккаунт?{" "}
                 <a href=" " onClick={() => navigate("/login")}>
-                  Sign in
+                  Войти
                 </a>
               </p>
 
-              <p className="text-center" style={{ marginTop: "-10px", marginBottom: "-35px"}}>
-              Go back to the{" "}
+              <p
+                className="text-center"
+                style={{ marginTop: "-10px", marginBottom: "-35px" }}
+              >
+                Вернуться на{" "}
                 <a href=" " onClick={() => navigate("/")}>
-                Homepage
+                  Главную
                 </a>
               </p>
-
             </MDBCardBody>
           </MDBCard>
         </MDBCol>

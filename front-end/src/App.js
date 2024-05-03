@@ -4,13 +4,13 @@ import { Route, Routes } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import Dashboard from "./Dashboard";
 import AdminDashboard from "./AdminDashboard";
+import GuestDashboard from "./GuestDashboard";
 import Homepage from "./Homepage";
 import Login from "./Login";
 import PrivateRoute from "./PrivateRoute";
-import AssignmentView from "./AssignmentView";
 import AdminPanelRequests from "./AdminPanelRequests"
+import AdminPanelUsers from "./AdminPanelUsers"
 import "bootstrap/dist/css/bootstrap.min.css";
-import CodeReviewerAssignmentView from "./CodeReviewerAssignmentView";
 import { useUser } from "./UserProvider";
 import Register from "./Register";
 
@@ -39,6 +39,10 @@ function App() {
             <PrivateRoute>
               <AdminDashboard />
             </PrivateRoute>
+          ) : roles && roles.find((role) => role === "GUEST") ? (
+            <PrivateRoute>
+              <GuestDashboard />
+            </PrivateRoute>
           ) : (
             <PrivateRoute>
               <Dashboard />
@@ -46,26 +50,14 @@ function App() {
           )
         }
       />
-      <Route
-        path="/assignments/:assignmentId"
-        element={
-          roles && roles.find((role) => role === "ADMIN") ? (
-            <PrivateRoute>
-              <CodeReviewerAssignmentView />
-            </PrivateRoute>
-          ) : (
-            <PrivateRoute>
-              <AssignmentView />
-            </PrivateRoute>
-          )
-        }
-      />
       <Route path="/login" element={<Login />} />
       <Route path="/" element={<Homepage />} />
       <Route path="/registration" element={<Register />} />
-      <Route path="/adminPanelRequests" element={<AdminPanelRequests/>} />
+      <Route path="/adminPanelRequests" element={<PrivateRoute><AdminPanelRequests/></PrivateRoute>} />
+      <Route path="/adminPanelUsers" element={<PrivateRoute><AdminPanelUsers/></PrivateRoute>} />
     </Routes>
   );
+  
 }
 
 export default App;

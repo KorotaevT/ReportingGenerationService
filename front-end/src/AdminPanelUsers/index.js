@@ -1,17 +1,17 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button, Col, Row, Container, Table } from "react-bootstrap";
+import { Button, Col, Row, Container, Table, Form } from "react-bootstrap";
 import { useUser } from "../UserProvider";
 import { useInterval } from "../util/useInterval";
 import validateToken from "../util/tokenValidator";
 import ajax from "../Services/fetchService";
 
-const AdminPanelRequests = () => {
+const AdminPanelUsers = () => {
   const user = useUser();
   const navigate = useNavigate();
   const userRef = useRef(user);
   const navigateRef = useRef(navigate);
-  const [guestUsers, setGuestUsers] = useState([]);
+  const [userProfiles, setUserProfiles] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -41,43 +41,57 @@ const AdminPanelRequests = () => {
 
   useEffect(() => {
     setIsLoading(true);
-    ajax(`/api/admin/getAuthRequests`, "GET", user.jwt).then((response) => {
-      setGuestUsers(response.sort((a, b) => a.registrationDate.localeCompare(b.registrationDate)));
+    ajax(`/api/admin/getUsers`, "GET", user.jwt).then((response) => {
+      const sortedUsers = response.sort((a, b) => {
+        if (!a.registrationDate || !b.registrationDate) {
+          return 0;
+        }
+        return a.registrationDate.localeCompare(b.registrationDate);
+      });
+      setUserProfiles(sortedUsers);
       setIsLoading(false);
     });
   }, []);
 
-  const handleApprove = (userId) => {
-    const userToApprove = guestUsers.find(
-      (guestUser) => guestUser.id === userId
-    );
-    ajax(
-      `/api/admin/approveAuthRequest`,
-      "PATCH",
-      user.jwt,
-      userToApprove
-    ).then(() => {
-      const updatedGuestUsers = guestUsers.filter(
-        (guestUser) => guestUser.id !== userId
-      );
-      setGuestUsers(updatedGuestUsers);
+  const handleRoleChange = (event, userId) => {
+    const updatedUserProfiles = userProfiles.map((userProfile) => {
+      if (userProfile.user.id === userId) {
+        return {
+          ...userProfile,
+          role: event.target.value,
+        };
+      }
+      return userProfile;
     });
+    setUserProfiles(updatedUserProfiles);
   };
 
-  const handleReject = (userId) => {
-    const userToReject = guestUsers.find(
-      (guestUser) => guestUser.id === userId
+  const handleSave = (userId) => {
+    const userToApprove = userProfiles.find(
+      (userProfile) => userProfile.user.id === userId
     );
-    ajax(
-      `/api/admin/rejectAuthRequest`,
-      "DELETE",
-      user.jwt,
-      userToReject
-    ).then(() => {
-      const updatedGuestUsers = guestUsers.filter(
-        (guestUser) => guestUser.id !== userId
+    ajax(`/api/admin/changeUserRole`, "PATCH", user.jwt, userToApprove).then(
+      () => {
+        if (userToApprove.role === "GUEST") {
+          const updatedUserProfiles = userProfiles.filter(
+            (userProfile) => userProfile.user.id !== userId
+          );
+          setUserProfiles(updatedUserProfiles);
+        }
+      }
+    );
+  };
+  
+
+  const handleDelete = (userId) => {
+    const userToReject = userProfiles.find(
+      (userProfile) => userProfile.user.id === userId
+    );
+    ajax(`/api/admin/deleteUser`, "DELETE", user.jwt, userToReject).then(() => {
+      const updatedUserProfiles = userProfiles.filter(
+        (userProfile) => userProfile.user.id !== userId
       );
-      setGuestUsers(updatedGuestUsers);
+      setUserProfiles(updatedUserProfiles);
     });
   };
 
@@ -105,10 +119,10 @@ const AdminPanelRequests = () => {
             <Button
               variant="primary"
               onClick={() => {
-                navigateRef.current("/AdminPanelUsers");
+                navigateRef.current("/AdminPanelRequests");
               }}
             >
-              Users
+              Requests
             </Button>
             <Button
               variant="danger"
@@ -126,48 +140,58 @@ const AdminPanelRequests = () => {
       <Row className="mt-4">
         <Col>
           <div className="h1 d-flex justify-content-center align-items-center">
-            Requests
+            Users
           </div>
         </Col>
       </Row>
       <div className="mt-4 report-wrapper report">
         {isLoading ? (
           <p>Загрузка...</p>
-        ) : guestUsers.length > 0 ? (
+        ) : userProfiles.length > 0 ? (
           <Table striped bordered hover>
             <thead>
               <tr>
                 <th className="text-center align-middle">#</th>
                 <th className="text-center align-middle">Username</th>
                 <th className="text-center align-middle">Registration date</th>
+                <th className="text-center align-middle">Role</th>
                 <th className="text-center align-middle">Action</th>
               </tr>
             </thead>
             <tbody>
-              {guestUsers.map((guestUser, index) => (
-                <tr key={guestUser.id}>
+              {userProfiles.map((userProfile, index) => (
+                <tr key={userProfile.user.id}>
                   <td className="text-center align-middle">{index + 1}</td>
                   <td className="text-center align-middle">
-                    {guestUser.username}
+                    {userProfile.user.username}
                   </td>
                   <td className="text-center align-middle">
-                    {guestUser.registrationDate}
+                    {userProfile.user.registrationDate}
                   </td>
-
+                  <td className="text-center align-middle">
+                    <Form.Select
+                      value={userProfile.role}
+                      onChange={(e) => handleRoleChange(e, userProfile.user.id)}
+                    >
+                      <option value="GUEST">GUEST</option>
+                      <option value="USER">USER</option>
+                      <option value="ADMIN">ADMIN</option>
+                    </Form.Select>
+                  </td>
                   <td className="d-flex justify-content-center">
                     <Button
                       variant="success"
                       className="mx-1"
-                      onClick={() => handleApprove(guestUser.id)}
+                      onClick={() => handleSave(userProfile.user.id)}
                     >
-                      Approve
+                      Save
                     </Button>{" "}
                     <Button
                       variant="danger"
                       className="mx-1"
-                      onClick={() => handleReject(guestUser.id)}
+                      onClick={() => handleDelete(userProfile.user.id)}
                     >
-                      Reject
+                      Delete
                     </Button>
                   </td>
                 </tr>
@@ -182,4 +206,4 @@ const AdminPanelRequests = () => {
   );
 };
 
-export default AdminPanelRequests;
+export default AdminPanelUsers;

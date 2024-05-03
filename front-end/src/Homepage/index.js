@@ -1,5 +1,5 @@
 import React from "react";
-import { MDBContainer, MDBCol, MDBRow, MDBBtn } from "mdb-react-ui-kit";
+import { MDBContainer, MDBCol, MDBRow} from "mdb-react-ui-kit";
 import { Button } from "react-bootstrap";
 
 function App() {
@@ -17,11 +17,11 @@ function App() {
         <MDBCol col="4" md="6">
           <h1
             className="text-black mb-5 d-flex justify-content-center align-items-center"
-            style={{ marginTop: "10px" }}
+            style={{ marginTop: "30px" }}
           >
-            Task Review Service
+            Генерация отчётов
           </h1>
-          <div style={{ marginTop: "120px" }}>
+          <div style={{ marginTop: "100px", padding: '0 60px' }}>
             <Button
               className="mb-5 w-100"
               size="lg"
@@ -29,7 +29,7 @@ function App() {
                 window.location.href = "/registration";
               }}
             >
-              Registration
+              Регистрация
             </Button>
             <Button
               className="mb-5 w-100"
@@ -38,7 +38,7 @@ function App() {
                 window.location.href = "/login";
               }}
             >
-              Login
+              Логин
             </Button>
           </div>
         </MDBCol>
