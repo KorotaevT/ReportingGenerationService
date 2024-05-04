@@ -7,23 +7,27 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name="tables")
+@Table(name="report")
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Tables {
+public class Report {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "database_id")
-    private Database database;
-
     private String name;
 
+    private String url;
+
+    private String username;
+
+    private String password;
+
     private String fields;
+
+    private String query;
 
 }

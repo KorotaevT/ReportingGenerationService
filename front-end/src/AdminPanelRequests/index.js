@@ -92,15 +92,15 @@ const AdminPanelRequests = () => {
                 navigateRef.current("/dashboard");
               }}
             >
-              Back
+              Назад
             </Button>
             <Button
               variant="primary"
               onClick={() => {
-                navigateRef.current("/admin/reports");
+                navigateRef.current("/AdminPanelReports");
               }}
             >
-              Reports
+              Отчёты
             </Button>
             <Button
               variant="primary"
@@ -108,7 +108,7 @@ const AdminPanelRequests = () => {
                 navigateRef.current("/AdminPanelUsers");
               }}
             >
-              Users
+              Пользователи
             </Button>
             <Button
               variant="danger"
@@ -126,7 +126,7 @@ const AdminPanelRequests = () => {
       <Row className="mt-4">
         <Col>
           <div className="h1 d-flex justify-content-center align-items-center">
-            Requests
+            Запросы на регистрацию
           </div>
         </Col>
       </Row>
@@ -138,9 +138,9 @@ const AdminPanelRequests = () => {
             <thead>
               <tr>
                 <th className="text-center align-middle">#</th>
-                <th className="text-center align-middle">Username</th>
-                <th className="text-center align-middle">Registration date</th>
-                <th className="text-center align-middle">Action</th>
+                <th className="text-center align-middle">ФИО</th>
+                <th className="text-center align-middle">Дата регистрации</th>
+                <th className="text-center align-middle">Действия</th>
               </tr>
             </thead>
             <tbody>
@@ -160,14 +160,14 @@ const AdminPanelRequests = () => {
                       className="mx-1"
                       onClick={() => handleApprove(guestUser.id)}
                     >
-                      Approve
+                      Подтвердить
                     </Button>{" "}
                     <Button
                       variant="danger"
                       className="mx-1"
                       onClick={() => handleReject(guestUser.id)}
                     >
-                      Reject
+                      Отклонить
                     </Button>
                   </td>
                 </tr>

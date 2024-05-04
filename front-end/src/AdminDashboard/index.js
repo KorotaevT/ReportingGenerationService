@@ -47,7 +47,7 @@ const AdminDashboard = () => {
                 navigateRef.current("/adminPanelRequests");
               }}
             >
-              Admin Panel
+              Панель администратора
             </Button>
             <Button
               variant="danger"
@@ -65,15 +65,11 @@ const AdminDashboard = () => {
       <Row className="mt-2">
         <Col>
           <div className="h1 d-flex justify-content-center align-items-center">
-            Reporting Dashboard
+            Доступные отчёты
           </div>
         </Col>
       </Row>
-      <div className="mt-4 report-wrapper report">
-        <div className="report-wrapper-title h3 px-2">
-          Available reports
-        </div>
-      </div>
+      <div className="mt-4 report-wrapper report"></div>
     </Container>
   );
 };

@@ -3,6 +3,7 @@ package cs.vsu.ReportingGenerationService.controller;
 import cs.vsu.ReportingGenerationService.dto.UserDTO;
 import cs.vsu.ReportingGenerationService.enums.Role;
 import cs.vsu.ReportingGenerationService.model.Authority;
+import cs.vsu.ReportingGenerationService.model.Report;
 import cs.vsu.ReportingGenerationService.model.User;
 import cs.vsu.ReportingGenerationService.service.AdminService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -111,5 +112,10 @@ public class AdminController {
         } else {
             return ResponseEntity.ok(new ArrayList<>());
         }
+    }
+
+    @PutMapping("/createReport")
+    public ResponseEntity<String> createReport(@RequestBody Report report) {
+        return ResponseEntity.ok("ok");
     }
 }

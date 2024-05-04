@@ -1,8 +1,6 @@
 package cs.vsu.ReportingGenerationService.dao;
 
-import cs.vsu.ReportingGenerationService.model.Database;
-import cs.vsu.ReportingGenerationService.model.Tables;
-import cs.vsu.ReportingGenerationService.repository.DatabaseRepository;
+import cs.vsu.ReportingGenerationService.repository.ReportRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -13,14 +11,15 @@ import java.util.*;
 public class DynamicTableReader {
 
     @Autowired
-    private DatabaseRepository databaseRepository;
+    private ReportRepository reportRepository;
 
     public List<Map<String, Map<String, Map<String, List<Object>>>>> getTablesData() throws SQLException {
 
-        List<Database> databases = databaseRepository.findAll();
         List<Map<String, Map<String, Map<String, List<Object>>>>> tablesData = new ArrayList<>();
 
-        for (Database database : databases) {
+ /*     List<Report> databases = reportRepository.findAll();
+
+        for (Report database : databases) {
             String url = database.getUrl();
             String user = database.getUsername();
             String password = database.getPassword();
@@ -53,17 +52,19 @@ public class DynamicTableReader {
 
             dbTablesData.put(database.getName(), tableMap);
             tablesData.add(dbTablesData);
-        }
+        }*/
 
         return tablesData;
     }
 
     public List<Map<String, Map<String, Map<String, List<Object>>>>> getDbStructure() {
 
-        List<Database> databases = databaseRepository.findAll();
         List<Map<String, Map<String, Map<String, List<Object>>>>> tablesData = new ArrayList<>();
 
-        for (Database database : databases) {
+/*        List<Report> databases = databaseRepository.findAll();
+        List<Map<String, Map<String, Map<String, List<Object>>>>> tablesData = new ArrayList<>();
+
+        for (Report database : databases) {
             List<Tables> tables = database.getTables();
             Map<String, Map<String, Map<String, List<Object>>>> dbTablesData = new LinkedHashMap<>();
             Map<String, Map<String, List<Object>>> tableMap = new LinkedHashMap<>();
@@ -75,7 +76,7 @@ public class DynamicTableReader {
             }
             dbTablesData.put(database.getName(), tableMap);
             tablesData.add(dbTablesData);
-        }
+        }*/
 
         return tablesData;
     }

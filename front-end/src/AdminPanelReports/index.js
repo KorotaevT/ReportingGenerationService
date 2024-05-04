@@ -1,18 +1,28 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button, Col, Row, Container, Table, Form } from "react-bootstrap";
+import {
+  Button,
+  Col,
+  Row,
+  Container,
+  Table,
+  Form,
+  Card,
+} from "react-bootstrap";
 import { useUser } from "../UserProvider";
 import { useInterval } from "../util/useInterval";
 import validateToken from "../util/tokenValidator";
 import ajax from "../Services/fetchService";
 
-const AdminPanelUsers = () => {
+const AdminPanelReports = () => {
   const user = useUser();
   const navigate = useNavigate();
   const userRef = useRef(user);
   const navigateRef = useRef(navigate);
   const [userProfiles, setUserProfiles] = useState([]);
+  const [reports, setReports] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [addReport, setAddReport] = useState(false);
 
   useEffect(() => {
     userRef.current = user;
@@ -50,6 +60,11 @@ const AdminPanelUsers = () => {
       });
       setUserProfiles(sortedUsers);
       setIsLoading(false);
+    });
+
+    // Получение отчетов
+    ajax(`/api/admin/getReports`, "GET", user.jwt).then((response) => {
+      setReports(response);
     });
   }, []);
 
@@ -110,18 +125,18 @@ const AdminPanelUsers = () => {
             <Button
               variant="primary"
               onClick={() => {
-                navigateRef.current("/AdminPanelRequests");
+                navigateRef.current("/AdminPanelUsers");
               }}
             >
-              Запросы
+              Пользователи
             </Button>
             <Button
               variant="primary"
               onClick={() => {
-                navigateRef.current("/AdminPanelReports");
+                navigateRef.current("/AdminPanelRequests");
               }}
             >
-              Отчёты
+              Запросы
             </Button>
             <Button
               variant="danger"
@@ -136,73 +151,74 @@ const AdminPanelUsers = () => {
         </Col>
       </Row>
 
-      <Row className="mt-4">
+      <Row className="mt-2">
         <Col>
           <div className="h1 d-flex justify-content-center align-items-center">
-            Пользователи
+            Редактирование отчётов
           </div>
         </Col>
       </Row>
-      <div className="mt-4 report-wrapper report">
-        {isLoading ? (
-          <p>Загрузка...</p>
-        ) : userProfiles.length > 0 ? (
-          <Table striped bordered hover>
-            <thead>
-              <tr>
-                <th className="text-center align-middle">#</th>
-                <th className="text-center align-middle">ФИО</th>
-                <th className="text-center align-middle">Дата регистрации</th>
-                <th className="text-center align-middle">Роль</th>
-                <th className="text-center align-middle">Действия</th>
-              </tr>
-            </thead>
-            <tbody>
-              {userProfiles.map((userProfile, index) => (
-                <tr key={userProfile.user.id}>
-                  <td className="text-center align-middle">{index + 1}</td>
-                  <td className="text-center align-middle">
-                    {userProfile.user.username}
-                  </td>
-                  <td className="text-center align-middle">
-                    {userProfile.user.registrationDate}
-                  </td>
-                  <td className="text-center align-middle">
-                    <Form.Select
-                      value={userProfile.role}
-                      onChange={(e) => handleRoleChange(e, userProfile.user.id)}
-                    >
-                      <option value="GUEST">GUEST</option>
-                      <option value="USER">USER</option>
-                      <option value="ADMIN">ADMIN</option>
-                    </Form.Select>
-                  </td>
-                  <td className="d-flex justify-content-center">
-                    <Button
-                      variant="success"
-                      className="mx-1"
-                      onClick={() => handleSave(userProfile.user.id)}
-                    >
-                      Сохранить
-                    </Button>{" "}
-                    <Button
-                      variant="danger"
-                      className="mx-1"
-                      onClick={() => handleDelete(userProfile.user.id)}
-                    >
-                      Удалить
-                    </Button>
-                  </td>
-                </tr>
+
+      <Row className="mt-4 report-wrapper report">
+        <Col>
+          <Card
+            style={{
+              width: "100%",
+              border: "2px solid #000000",
+            }}
+            onClick={() => {
+              navigateRef.current("/CreateReport");
+            }}
+          >
+            <Card.Body className="d-flex flex-column justify-content-center align-items-center">
+              <Card.Title
+                className="text-center"
+                style={{ fontWeight: "bolder", fontSize: "2rem" }}
+              >
+                Создать отчёт
+              </Card.Title>
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
+
+      <Row>
+        <Col>
+          {reports && reports.length > 0 ? (
+            <div
+              className="d-grid gap-5"
+              style={{ gridTemplateColumns: "100%" }}
+            >
+              {reports.map((report) => (
+                <Card
+                  key={report.id}
+                  style={{ width: "18rem", height: "18rem" }}
+                  onClick={() => {
+                    navigateRef.current(`/reports/${report.id}`);
+                  }}
+                >
+                  <Card.Body className="d-flex flex-column justify-content-around">
+                    <Card.Title>Report #{report.number}</Card.Title>
+                    <div className="d-flex align-items-strat"></div>
+                    <Card.Text style={{ marginTop: "1m" }}>
+                      <p>
+                        <b>Title:</b> {report.title}
+                      </p>
+                      <p>
+                        <b>Author:</b> {report.author}
+                      </p>
+                    </Card.Text>
+                  </Card.Body>
+                </Card>
               ))}
-            </tbody>
-          </Table>
-        ) : (
-          <p>Нет активных запросов</p>
-        )}
-      </div>
+            </div>
+          ) : (
+            <div></div>
+          )}
+        </Col>
+      </Row>
     </Container>
   );
 };
 
-export default AdminPanelUsers;
+export default AdminPanelReports;

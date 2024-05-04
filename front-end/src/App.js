@@ -10,9 +10,11 @@ import Login from "./Login";
 import PrivateRoute from "./PrivateRoute";
 import AdminPanelRequests from "./AdminPanelRequests"
 import AdminPanelUsers from "./AdminPanelUsers"
+import AdminPanelReports from "./AdminPanelReports"
 import "bootstrap/dist/css/bootstrap.min.css";
 import { useUser } from "./UserProvider";
 import Register from "./Register";
+import CreateReport from "./CreateReport";
 
 function App() {
   const [roles, setRoles] = useState([]);
@@ -55,6 +57,8 @@ function App() {
       <Route path="/registration" element={<Register />} />
       <Route path="/adminPanelRequests" element={<PrivateRoute><AdminPanelRequests/></PrivateRoute>} />
       <Route path="/adminPanelUsers" element={<PrivateRoute><AdminPanelUsers/></PrivateRoute>} />
+      <Route path="/adminPanelReports" element={<PrivateRoute><AdminPanelReports/></PrivateRoute>} />
+      <Route path="/createReport" element={<PrivateRoute><CreateReport/></PrivateRoute>} />
     </Routes>
   );
   
