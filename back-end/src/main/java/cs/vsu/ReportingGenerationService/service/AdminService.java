@@ -3,12 +3,15 @@ package cs.vsu.ReportingGenerationService.service;
 import cs.vsu.ReportingGenerationService.dto.UserDTO;
 import cs.vsu.ReportingGenerationService.enums.Role;
 import cs.vsu.ReportingGenerationService.model.Authority;
+import cs.vsu.ReportingGenerationService.model.Report;
 import cs.vsu.ReportingGenerationService.model.User;
 import cs.vsu.ReportingGenerationService.repository.AuthorityRepository;
+import cs.vsu.ReportingGenerationService.repository.ReportRepository;
 import cs.vsu.ReportingGenerationService.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 import java.util.Optional;
@@ -22,6 +25,9 @@ public class AdminService {
     @Autowired
     AuthorityRepository authorityRepository;
 
+    @Autowired
+    ReportRepository reportRepository;
+
     public Optional<List<User>> getAuthRequests() {
         return userRepository.findAllByAuthoritiesRole(Role.GUEST);
     }
@@ -29,6 +35,10 @@ public class AdminService {
     public Optional<List<User>> getUsers() {
         return userRepository.findAllByAuthoritiesRoleNot(Role.GUEST);
     }
+
+    public Optional<List<Report>> getReports() {return Optional.ofNullable(reportRepository.findAll());}
+
+    public Optional<Report> getReportById(Long id) {return Optional.ofNullable(reportRepository.findById(id));}
 
     @Transactional
     public Optional<List<User>> approveAuthRequest(User user) {
@@ -82,4 +92,28 @@ public class AdminService {
         return userRepository.findAllByAuthoritiesRoleNot(Role.GUEST);
     }
 
+    public void createReport(Report report) {
+        reportRepository.save(report);
+    }
+
+    public void changeReport(Report updatedReport) {
+        Optional<Report> existingReportOptional = Optional.ofNullable(reportRepository.findById(updatedReport.getId()));
+
+        if (existingReportOptional.isPresent()) {
+            Report existingReport = existingReportOptional.get();
+            existingReport.setName(updatedReport.getName());
+            existingReport.setUrl(updatedReport.getUrl());
+            existingReport.setUsername(updatedReport.getUsername());
+            existingReport.setPassword(updatedReport.getPassword());
+            existingReport.setFields(updatedReport.getFields());
+            existingReport.setQuery(updatedReport.getQuery());
+            reportRepository.save(existingReport);
+        }
+    }
+
+
+    @Transactional
+    public void deleteReportById(Long id) {
+        reportRepository.deleteById(id);
+    }
 }

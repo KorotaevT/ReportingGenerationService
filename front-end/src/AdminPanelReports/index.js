@@ -1,28 +1,18 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  Button,
-  Col,
-  Row,
-  Container,
-  Table,
-  Form,
-  Card,
-} from "react-bootstrap";
 import { useUser } from "../UserProvider";
 import { useInterval } from "../util/useInterval";
 import validateToken from "../util/tokenValidator";
 import ajax from "../Services/fetchService";
+
+import { Button, Col, Row, Container, Card } from "react-bootstrap";
 
 const AdminPanelReports = () => {
   const user = useUser();
   const navigate = useNavigate();
   const userRef = useRef(user);
   const navigateRef = useRef(navigate);
-  const [userProfiles, setUserProfiles] = useState([]);
   const [reports, setReports] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [addReport, setAddReport] = useState(false);
 
   useEffect(() => {
     userRef.current = user;
@@ -50,64 +40,10 @@ const AdminPanelReports = () => {
   }, 60000);
 
   useEffect(() => {
-    setIsLoading(true);
-    ajax(`/api/admin/getUsers`, "GET", user.jwt).then((response) => {
-      const sortedUsers = response.sort((a, b) => {
-        if (!a.registrationDate || !b.registrationDate) {
-          return 0;
-        }
-        return a.registrationDate.localeCompare(b.registrationDate);
-      });
-      setUserProfiles(sortedUsers);
-      setIsLoading(false);
-    });
-
-    // Получение отчетов
     ajax(`/api/admin/getReports`, "GET", user.jwt).then((response) => {
       setReports(response);
     });
   }, []);
-
-  const handleRoleChange = (event, userId) => {
-    const updatedUserProfiles = userProfiles.map((userProfile) => {
-      if (userProfile.user.id === userId) {
-        return {
-          ...userProfile,
-          role: event.target.value,
-        };
-      }
-      return userProfile;
-    });
-    setUserProfiles(updatedUserProfiles);
-  };
-
-  const handleSave = (userId) => {
-    const userToApprove = userProfiles.find(
-      (userProfile) => userProfile.user.id === userId
-    );
-    ajax(`/api/admin/changeUserRole`, "PATCH", user.jwt, userToApprove).then(
-      () => {
-        if (userToApprove.role === "GUEST") {
-          const updatedUserProfiles = userProfiles.filter(
-            (userProfile) => userProfile.user.id !== userId
-          );
-          setUserProfiles(updatedUserProfiles);
-        }
-      }
-    );
-  };
-
-  const handleDelete = (userId) => {
-    const userToReject = userProfiles.find(
-      (userProfile) => userProfile.user.id === userId
-    );
-    ajax(`/api/admin/deleteUser`, "DELETE", user.jwt, userToReject).then(() => {
-      const updatedUserProfiles = userProfiles.filter(
-        (userProfile) => userProfile.user.id !== userId
-      );
-      setUserProfiles(updatedUserProfiles);
-    });
-  };
 
   return (
     <Container>
@@ -158,13 +94,26 @@ const AdminPanelReports = () => {
           </div>
         </Col>
       </Row>
-
       <Row className="mt-4 report-wrapper report">
         <Col>
           <Card
             style={{
               width: "100%",
               border: "2px solid #000000",
+              marginBottom: "1rem",
+              transition:
+                "box-shadow 0.3s ease-in-out, transform 0.3s ease-in-out, background-color 0.3s ease-in-out",
+            }}
+            onMouseOver={(e) => {
+              e.currentTarget.style.boxShadow =
+                "0 4px 8px 0 rgba(0, 0, 0, 0.2)";
+              e.currentTarget.style.transform = "scale(1.02)";
+              e.currentTarget.style.backgroundColor = "#DCDCDC";
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.boxShadow = "none";
+              e.currentTarget.style.transform = "scale(1)";
+              e.currentTarget.style.backgroundColor = "#fff";
             }}
             onClick={() => {
               navigateRef.current("/CreateReport");
@@ -173,41 +122,55 @@ const AdminPanelReports = () => {
             <Card.Body className="d-flex flex-column justify-content-center align-items-center">
               <Card.Title
                 className="text-center"
-                style={{ fontWeight: "bolder", fontSize: "2rem" }}
+                style={{
+                  fontWeight: "bolder",
+                  fontSize: "2rem",
+                  textDecoration: "none",
+                }}
               >
                 Создать отчёт
               </Card.Title>
             </Card.Body>
           </Card>
-        </Col>
-      </Row>
-
-      <Row>
-        <Col>
           {reports && reports.length > 0 ? (
-            <div
-              className="d-grid gap-5"
-              style={{ gridTemplateColumns: "100%" }}
-            >
+            <div>
               {reports.map((report) => (
                 <Card
                   key={report.id}
-                  style={{ width: "18rem", height: "18rem" }}
-                  onClick={() => {
-                    navigateRef.current(`/reports/${report.id}`);
+                  style={{
+                    width: "100%",
+                    border: "2px solid #000000",
+                    marginBottom: "1rem",
+                    transition:
+                      "box-shadow 0.3s ease-in-out, transform 0.3s ease-in-out, background-color 0.3s ease-in-out",
                   }}
+                  onMouseOver={(e) => {
+                    e.currentTarget.style.boxShadow =
+                      "0 4px 8px 0 rgba(0, 0, 0, 0.2)";
+                    e.currentTarget.style.transform = "scale(1.02)";
+                    e.currentTarget.style.backgroundColor = "#DCDCDC";
+                  }}
+                  onMouseOut={(e) => {
+                    e.currentTarget.style.boxShadow = "none";
+                    e.currentTarget.style.transform = "scale(1)";
+                    e.currentTarget.style.backgroundColor = "#fff";
+                  }}
+                  onClick={() => {
+                    navigateRef.current(`/changeReport/${report.id}`);
+                  }}
+                  
                 >
                   <Card.Body className="d-flex flex-column justify-content-around">
-                    <Card.Title>Report #{report.number}</Card.Title>
-                    <div className="d-flex align-items-strat"></div>
-                    <Card.Text style={{ marginTop: "1m" }}>
-                      <p>
-                        <b>Title:</b> {report.title}
-                      </p>
-                      <p>
-                        <b>Author:</b> {report.author}
-                      </p>
-                    </Card.Text>
+                    <Card.Title
+                      className="text-center"
+                      style={{
+                        fontWeight: "bolder",
+                        fontSize: "2rem",
+                        textDecoration: "none",
+                      }}
+                    >
+                      {report.name}
+                    </Card.Title>
                   </Card.Body>
                 </Card>
               ))}

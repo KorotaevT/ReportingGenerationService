@@ -84,3 +84,17 @@
   padding: 10px;
   margin-bottom: 15px;
 }
+
+.report-card {
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.report-card:hover {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transform: scale(1.02);
+}
+
+.report-card:hover .card-title {
+  text-decoration: underline;
+}

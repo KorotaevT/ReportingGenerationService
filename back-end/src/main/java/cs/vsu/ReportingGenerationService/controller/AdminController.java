@@ -11,9 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -53,6 +51,17 @@ public class AdminController {
         }
     }
 
+    @GetMapping("/getReports")
+    public ResponseEntity<List<Report>> getReports() {
+        List<Report> reportList = adminService.getReports().orElseThrow();
+        return ResponseEntity.ok(reportList);
+    }
+
+    @GetMapping("/getReportById/{id}")
+    public ResponseEntity<Report> getReportById(@PathVariable Long id) {
+        Report responseReport = adminService.getReportById(id).orElseThrow();
+        return ResponseEntity.ok(responseReport);
+    }
 
     @PatchMapping("/approveAuthRequest")
     public ResponseEntity<Optional<List<User>>> approveAuthRequest(@RequestBody User user) {
@@ -115,7 +124,29 @@ public class AdminController {
     }
 
     @PutMapping("/createReport")
-    public ResponseEntity<String> createReport(@RequestBody Report report) {
-        return ResponseEntity.ok("ok");
+    public ResponseEntity<Map<String, Object>> createReport(@RequestBody Report report) {
+        adminService.createReport(report);
+        Map<String, Object> response = new HashMap<>();
+        response.put("success", true);
+        response.put("data", null);
+        return ResponseEntity.ok(response);
+    }
+
+    @PatchMapping("/changeReport")
+    public ResponseEntity<Map<String, Object>> changeReport(@RequestBody Report report) {
+        adminService.changeReport(report);
+        Map<String, Object> response = new HashMap<>();
+        response.put("success", true);
+        response.put("data", null);
+        return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/deleteReport/{id}")
+    public ResponseEntity<Map<String, Object>> deleteReport(@PathVariable Long id) {
+        adminService.deleteReportById(id);
+        Map<String, Object> response = new HashMap<>();
+        response.put("success", true);
+        response.put("data", null);
+        return ResponseEntity.ok(response);
     }
 }

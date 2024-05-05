@@ -1,14 +1,15 @@
-import React, { useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useRef, useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { useUser } from "../UserProvider";
 import ajax from "../Services/fetchService";
 import { Button, Col, Row, Container, Form } from "react-bootstrap";
 
-const CreateReport = () => {
+const ChangeReport = () => {
   const user = useUser();
   const navigate = useNavigate();
   const userRef = useRef(user);
   const navigateRef = useRef(navigate);
+  const { id } = useParams();
 
   const [name, setName] = useState("");
   const [url, setUrl] = useState("");
@@ -16,11 +17,23 @@ const CreateReport = () => {
   const [password, setPassword] = useState("");
   const [fields, setFields] = useState("");
   const [query, setQuery] = useState("");
+  const [reportId, setReportId] = useState("");
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-
+  useEffect(() => {
+    ajax(`/api/admin/getReportById/${id}`, "GET", user.jwt).then((response) => {
+      setReportId(response.id);
+      setName(response.name);
+      setUrl(response.url);
+      setUsername(response.username);
+      setPassword(response.password);
+      setFields(response.fields);
+      setQuery(response.query);
+    });
+  }, [id, user.jwt]);
+  
+  const handleSave = () => {
     const reportData = {
+      id: reportId,
       name,
       url,
       username,
@@ -28,8 +41,16 @@ const CreateReport = () => {
       fields,
       query,
     };
+  
+    ajax(`/api/admin/changeReport`, "PATCH", user.jwt, reportData).then(() => {
+      navigateRef.current("/AdminPanelReports");
+    });
+  };
+  
 
-    ajax("/api/admin/createReport", "PUT", user.jwt, reportData).then(() => {
+  const handleDelete = () => {
+    ajax(`/api/admin/deleteReport/${id}`, "DELETE", user.jwt).then(() => {
+      navigateRef.current("/AdminPanelReports");
     });
   };
 
@@ -61,13 +82,13 @@ const CreateReport = () => {
       <Row className="mt-4">
         <Col>
           <div className="h1 d-flex justify-content-center align-items-center">
-            Создание отчёта
+            Редактирование отчёта
           </div>
         </Col>
       </Row>
       <Row className="mt-3">
         <Col>
-          <Form onSubmit={handleSubmit} className="create-report-form">
+          <Form className="create-report-form">
             <Form.Group controlId="reportName">
               <Form.Label className="create-report-label">
                 Название отчета:
@@ -145,18 +166,31 @@ const CreateReport = () => {
                 placeholder="SELECT * FROM example_table;"
               />
             </Form.Group>
-            <Button
-              variant="primary"
-              type="submit"
-              style={{
-                width: "20%",
-                fontSize: "18px",
-                margin: "auto",
-                display: "block",
-              }}
-            >
-              Создать отчет
-            </Button>
+            <div className="d-flex justify-content-center mt-3">
+              <Button
+                variant="primary"
+                onClick={handleSave}
+                style={{
+                  width: "20%",
+                  fontSize: "18px",
+                  marginRight: "10px",
+                }}
+              >
+                Сохранить изменения
+              </Button>
+              <Button
+                variant="danger"
+                onClick={() => {
+                  handleDelete();
+                }}
+                style={{
+                  width: "20%",
+                  fontSize: "18px",
+                }}
+              >
+                Удалить отчет
+              </Button>
+            </div>
           </Form>
         </Col>
       </Row>
@@ -164,4 +198,4 @@ const CreateReport = () => {
   );
 };
 
-export default CreateReport;
+export default ChangeReport;
