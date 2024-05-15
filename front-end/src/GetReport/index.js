@@ -51,60 +51,62 @@ const GetReport = () => {
 
   useEffect(() => {
     ajax(`/api/data/getReportById/${id}`, "GET", user.jwt).then((response) => {
-      const fields = response.fields
+      const reportFields = response.fields
         .split(",")
+        .map((field) => field.trim())
         .concat([
           "Название отчета",
           "Названия полей",
           "Предоставитель отчета",
         ])
         .map((field) => ({ fieldName: field, isSelected: true }));
-
+  
       setReport({
         id: response.id,
         name: response.name,
         fields: {
-          variable: response.fields.split(",").map((field) => ({
-            fieldName: field,
-            isSelected: true,
-          })),
-          fixed: [
-            "Название отчета",
-            "Названия полей",
-            "Предоставитель отчета",
-          ].map((field) => ({
-            fieldName: field,
-            isSelected: true,
-          })),
+          variable: reportFields.filter(
+            (field) => !["Название отчета", "Названия полей", "Предоставитель отчета"].includes(field.fieldName)
+          ),
+          fixed: reportFields.filter(
+            (field) => ["Название отчета", "Названия полей", "Предоставитель отчета"].includes(field.fieldName)
+          ),
         },
       });
-      setFields(fields);
+      setFields(reportFields);
     });
   }, [id, user.jwt]);
-
-  const handleFieldChange = (field, isChecked) => {
-    setFields(
-      fields.map((f) =>
-        f.fieldName === field ? { ...f, isSelected: isChecked } : f
-      )
-    );
-  };
+  
 
   const handleGet = () => {
     const reportData = {
       id: report.id,
       fields: {
         variable: fields
-          .filter((field) => field.isSelected && !["Название отчета", "Названия полей", "Предоставитель отчета"].includes(field.fieldName))
+          .filter(
+            (field) =>
+              field.isSelected &&
+              ![
+                "Название отчета",
+                "Названия полей",
+                "Предоставитель отчета",
+              ].includes(field.fieldName)
+          )
           .map((field) => ({
             fieldName: field.fieldName,
-            isSelected: field.isSelected,
           })),
         fixed: fields
-          .filter((field) => field.isSelected && ["Название отчета", "Названия полей", "Предоставитель отчета"].includes(field.fieldName))
+          .filter(
+            (field) =>
+              field.isSelected &&
+              [
+                "Название отчета",
+                "Названия полей",
+                "Предоставитель отчета",
+              ].includes(field.fieldName)
+          )
           .map((field) => ({
             fieldName: field.fieldName,
-            isSelected: field.isSelected,
           })),
       },
     };
@@ -114,13 +116,28 @@ const GetReport = () => {
     );
   };
 
+  const handleFieldChange = (fieldName) => {
+    setFields(
+      fields.map((field) =>
+        field.fieldName === fieldName
+          ? { ...field, isSelected: !field.isSelected }
+          : field
+      )
+    );
+  };
+  
   const variableFields = useMemo(() => {
-    return report?.fields?.variable || [];
+    return report?.fields?.variable.map((field) => ({
+      fieldName: field.fieldName,
+    })) || [];
   }, [report]);
-
+  
   const fixedFields = useMemo(() => {
-    return report?.fields?.fixed || [];
+    return report?.fields?.fixed.map((field) => ({
+      fieldName: field.fieldName,
+    })) || [];
   }, [report]);
+  
 
   const maxRows = useMemo(() => {
     return Math.max(variableFields.length, fixedFields.length);
@@ -181,7 +198,10 @@ const GetReport = () => {
                   <td className="text-center">
                     <Form.Check
                       type="checkbox"
-                      checked={fields.find((f) => f.fieldName === field.fieldName)?.isSelected || false}
+                      checked={
+                        fields.find((f) => f.fieldName === field.fieldName)
+                          ?.isSelected || false
+                      }
                       onChange={(e) =>
                         handleFieldChange(field.fieldName, e.target.checked)
                       }
@@ -218,7 +238,10 @@ const GetReport = () => {
                       {field && (
                         <Form.Check
                           type="checkbox"
-                          checked={fields.find((f) => f.fieldName === field.fieldName)?.isSelected || false}
+                          checked={
+                            fields.find((f) => f.fieldName === field.fieldName)
+                              ?.isSelected || false
+                          }
                           onChange={(e) =>
                             handleFieldChange(field.fieldName, e.target.checked)
                           }

@@ -6,12 +6,15 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
+import java.util.Map;
 
 @Data
 @Builder
 @AllArgsConstructor
 @RequiredArgsConstructor
 public class ReportResponseDTO {
-    private Long id;
-    //TODO
+    private List<Map<String, Object>> data;
+    private String reportName;
+    private boolean fieldNames;
+    private String reportProvider;
 }

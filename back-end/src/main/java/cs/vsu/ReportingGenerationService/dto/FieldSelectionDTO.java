@@ -5,13 +5,10 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
-import java.util.List;
-
 @Data
 @Builder
 @AllArgsConstructor
 @RequiredArgsConstructor
 public class FieldSelectionDTO {
     private String fieldName;
-    private boolean isSelected;
 }

@@ -14,5 +14,5 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class ReportRequestDTO {
     private Long id;
-    private List<FieldSelectionDTO> fields;
+    private Map<String, List<FieldSelectionDTO>> fields;
 }
