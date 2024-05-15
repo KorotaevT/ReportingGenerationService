@@ -6,19 +6,18 @@ import cs.vsu.ReportingGenerationService.model.Authority;
 import cs.vsu.ReportingGenerationService.model.Report;
 import cs.vsu.ReportingGenerationService.model.User;
 import cs.vsu.ReportingGenerationService.service.AdminService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/admin")
 public class AdminController {
 
-    @Autowired
-    AdminService adminService;
+    private final AdminService adminService;
 
     @GetMapping("/getAuthRequests")
     public ResponseEntity<Optional<List<User>>> getAuthRequests() {

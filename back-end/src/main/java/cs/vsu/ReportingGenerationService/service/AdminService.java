@@ -8,6 +8,7 @@ import cs.vsu.ReportingGenerationService.model.User;
 import cs.vsu.ReportingGenerationService.repository.AuthorityRepository;
 import cs.vsu.ReportingGenerationService.repository.ReportRepository;
 import cs.vsu.ReportingGenerationService.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,16 +18,14 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class AdminService {
 
-    @Autowired
-    UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    AuthorityRepository authorityRepository;
+    private final AuthorityRepository authorityRepository;
 
-    @Autowired
-    ReportRepository reportRepository;
+    private final ReportRepository reportRepository;
 
     public Optional<List<User>> getAuthRequests() {
         return userRepository.findAllByAuthoritiesRole(Role.GUEST);
@@ -38,7 +37,7 @@ public class AdminService {
 
     public Optional<List<Report>> getReports() {return Optional.ofNullable(reportRepository.findAll());}
 
-    public Optional<Report> getReportById(Long id) {return Optional.ofNullable(reportRepository.findById(id));}
+    public Optional<Report> getReportById(Long id) {return reportRepository.findById(id);}
 
     @Transactional
     public Optional<List<User>> approveAuthRequest(User user) {
@@ -97,7 +96,7 @@ public class AdminService {
     }
 
     public void changeReport(Report updatedReport) {
-        Optional<Report> existingReportOptional = Optional.ofNullable(reportRepository.findById(updatedReport.getId()));
+        Optional<Report> existingReportOptional = reportRepository.findById(updatedReport.getId());
 
         if (existingReportOptional.isPresent()) {
             Report existingReport = existingReportOptional.get();

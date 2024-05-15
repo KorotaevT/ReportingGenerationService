@@ -3,6 +3,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useUser } from "../UserProvider";
 import ajax from "../Services/fetchService";
 import { Button, Col, Row, Container, Form } from "react-bootstrap";
+import { useInterval } from "../util/useInterval";
+import validateToken from "../util/tokenValidator";
 
 const ChangeReport = () => {
   const user = useUser();
@@ -18,6 +20,31 @@ const ChangeReport = () => {
   const [fields, setFields] = useState("");
   const [query, setQuery] = useState("");
   const [reportId, setReportId] = useState("");
+
+  useEffect(() => {
+    userRef.current = user;
+    navigateRef.current = navigate;
+  }, [user, navigate]);
+
+  useEffect(() => {
+    const checkTokenAndFetchData = async () => {
+      const isValid = await validateToken(userRef.current.jwt);
+      if (!isValid) {
+        userRef.current.setJwt(null);
+        navigateRef.current("/login");
+      }
+    };
+
+    checkTokenAndFetchData();
+  }, [userRef, navigateRef]);
+
+  useInterval(async () => {
+    const isValid = await validateToken(userRef.current.jwt);
+    if (!isValid) {
+      userRef.current.setJwt(null);
+      navigateRef.current("/login");
+    }
+  }, 60000);
 
   useEffect(() => {
     ajax(`/api/admin/getReportById/${id}`, "GET", user.jwt).then((response) => {

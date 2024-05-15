@@ -16,6 +16,7 @@ import { useUser } from "./UserProvider";
 import Register from "./Register";
 import CreateReport from "./CreateReport";
 import ChangeReport from "./ChangeReport";
+import GetReport from "./GetReport";
 
 function App() {
   const [roles, setRoles] = useState([]);
@@ -61,6 +62,7 @@ function App() {
       <Route path="/adminPanelReports" element={<PrivateRoute><AdminPanelReports/></PrivateRoute>} />
       <Route path="/createReport" element={<PrivateRoute><CreateReport/></PrivateRoute>} />
       <Route path="/changeReport/:id" element={<PrivateRoute><ChangeReport/></PrivateRoute>} />
+      <Route path="/getReport/:id" element={<PrivateRoute><GetReport/></PrivateRoute>} />
     </Routes>
   );
   
