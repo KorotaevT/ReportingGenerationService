@@ -5,6 +5,7 @@ import ajax from "../Services/fetchService";
 import { Button, Col, Row, Container, Form, Table } from "react-bootstrap";
 import { useInterval } from "../util/useInterval";
 import validateToken from "../util/tokenValidator";
+import "../App.css";
 
 const GetReport = () => {
   const user = useUser();
@@ -23,6 +24,7 @@ const GetReport = () => {
   });
 
   const [fields, setFields] = useState([]);
+  const [reportData, setReportData] = useState(null);
 
   useEffect(() => {
     userRef.current = user;
@@ -54,29 +56,33 @@ const GetReport = () => {
       const reportFields = response.fields
         .split(",")
         .map((field) => field.trim())
-        .concat([
-          "Название отчета",
-          "Названия полей",
-          "Предоставитель отчета",
-        ])
+        .concat(["Название отчета", "Названия полей", "Предоставитель отчета"])
         .map((field) => ({ fieldName: field, isSelected: true }));
-  
+
       setReport({
         id: response.id,
         name: response.name,
         fields: {
           variable: reportFields.filter(
-            (field) => !["Название отчета", "Названия полей", "Предоставитель отчета"].includes(field.fieldName)
+            (field) =>
+              ![
+                "Название отчета",
+                "Названия полей",
+                "Предоставитель отчета",
+              ].includes(field.fieldName)
           ),
-          fixed: reportFields.filter(
-            (field) => ["Название отчета", "Названия полей", "Предоставитель отчета"].includes(field.fieldName)
+          fixed: reportFields.filter((field) =>
+            [
+              "Название отчета",
+              "Названия полей",
+              "Предоставитель отчета",
+            ].includes(field.fieldName)
           ),
         },
       });
       setFields(reportFields);
     });
   }, [id, user.jwt]);
-  
 
   const handleGet = () => {
     const reportData = {
@@ -112,7 +118,9 @@ const GetReport = () => {
     };
 
     ajax(`/api/data/getReportDataById`, "POST", user.jwt, reportData).then(
-      () => {}
+      (response) => {
+        setReportData(response);
+      }
     );
   };
 
@@ -125,19 +133,22 @@ const GetReport = () => {
       )
     );
   };
-  
+
   const variableFields = useMemo(() => {
-    return report?.fields?.variable.map((field) => ({
-      fieldName: field.fieldName,
-    })) || [];
+    return (
+      report?.fields?.variable.map((field) => ({
+        fieldName: field.fieldName,
+      })) || []
+    );
   }, [report]);
-  
+
   const fixedFields = useMemo(() => {
-    return report?.fields?.fixed.map((field) => ({
-      fieldName: field.fieldName,
-    })) || [];
+    return (
+      report?.fields?.fixed.map((field) => ({
+        fieldName: field.fieldName,
+      })) || []
+    );
   }, [report]);
-  
 
   const maxRows = useMemo(() => {
     return Math.max(variableFields.length, fixedFields.length);
@@ -202,9 +213,7 @@ const GetReport = () => {
                         fields.find((f) => f.fieldName === field.fieldName)
                           ?.isSelected || false
                       }
-                      onChange={(e) =>
-                        handleFieldChange(field.fieldName, e.target.checked)
-                      }
+                      onChange={() => handleFieldChange(field.fieldName)}
                     />
                   </td>
                 </tr>
@@ -242,9 +251,7 @@ const GetReport = () => {
                             fields.find((f) => f.fieldName === field.fieldName)
                               ?.isSelected || false
                           }
-                          onChange={(e) =>
-                            handleFieldChange(field.fieldName, e.target.checked)
-                          }
+                          onChange={() => handleFieldChange(field.fieldName)}
                         />
                       )}
                     </td>
@@ -272,6 +279,61 @@ const GetReport = () => {
           </Button>
         </div>
       </Row>
+
+      {reportData && (
+        <Row className="mt-3">
+          <Col className="table-container">
+            <Table
+              striped
+              bordered
+              hover
+              size="sm"
+              className="fixed-header-table"
+            >
+              <tbody>
+                {reportData.reportName && (
+                  <tr>
+                    <td
+                      colSpan={Object.keys(reportData.data[0]).length}
+                      className="text-center"
+                    >
+                      {reportData.reportName}
+                    </td>
+                  </tr>
+                )}
+                {reportData.fieldNames && (
+                  <tr>
+                    {Object.keys(reportData.data[0]).map((field, index) => (
+                      <td key={index} className="text-center">
+                        {field}
+                      </td>
+                    ))}
+                  </tr>
+                )}
+                {reportData.data.map((row, rowIndex) => (
+                  <tr key={rowIndex}>
+                    {Object.values(row).map((value, colIndex) => (
+                      <td key={colIndex} className="text-center">
+                        {value}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+                {reportData.reportProvider && (
+                  <tr>
+                    <td
+                      colSpan={Object.keys(reportData.data[0]).length}
+                      className="text-center"
+                    >
+                      {reportData.reportProvider}
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </Table>
+          </Col>
+        </Row>
+      )}
     </Container>
   );
 };

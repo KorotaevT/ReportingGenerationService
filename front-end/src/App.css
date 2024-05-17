@@ -98,3 +98,38 @@
 .report-card:hover .card-title {
   text-decoration: underline;
 }
+
+.table-container {
+  max-height: 200px;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: auto;
+}
+
+.fixed-header-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.fixed-header-table thead th {
+  position: sticky;
+  top: 0;
+  background: white;
+  z-index: 1;
+}
+
+.fixed-header-table th, .fixed-header-table td {
+  width: 150px;
+}
+
+.fixed-header-table tbody tr:first-child,
+.fixed-header-table tbody tr:nth-child(2) {
+  background-color: #f2f2f2;
+}
+
+.fixed-header-table tbody tr td {
+  background-color: #ffffff; 
+}
+
+
+
