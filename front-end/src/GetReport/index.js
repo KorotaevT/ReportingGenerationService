@@ -124,6 +124,56 @@ const GetReport = () => {
     );
   };
 
+  const handleDownload = () => {
+    const reportData = {
+      id: report.id,
+      fields: {
+        variable: fields
+          .filter(
+            (field) =>
+              field.isSelected &&
+              ![
+                "Название отчета",
+                "Названия полей",
+                "Предоставитель отчета",
+              ].includes(field.fieldName)
+          )
+          .map((field) => ({
+            fieldName: field.fieldName,
+          })),
+        fixed: fields
+          .filter(
+            (field) =>
+              field.isSelected &&
+              [
+                "Название отчета",
+                "Названия полей",
+                "Предоставитель отчета",
+              ].includes(field.fieldName)
+          )
+          .map((field) => ({
+            fieldName: field.fieldName,
+          })),
+      },
+    };
+  
+    ajax(`/api/data/downloadExcel`, "POST", user.jwt, reportData)
+      .then((blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", "report.xlsx");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      })
+      .catch((error) => {
+        console.error("Error downloading Excel file:", error);
+      });
+  };
+  
+
+
   const handleFieldChange = (fieldName) => {
     setFields(
       fields.map((field) =>
@@ -193,7 +243,7 @@ const GetReport = () => {
       <Row className="mt-3 d-flex flex-column-reverse flex-md-row">
         <Col md={6} className="d-flex flex-column align-items-center">
           <div className="create-report-label">Доступные поля в отчете:</div>
-          <Table striped bordered hover size="sm">
+          <Table bordered hover size="sm">
             <thead>
               <tr>
                 <th className="text-center">#</th>
@@ -224,7 +274,7 @@ const GetReport = () => {
 
         <Col md={6} className="d-flex flex-column align-items-center">
           <div className="create-report-label">Отображать в отчете:</div>
-          <Table striped bordered hover size="sm">
+          <Table bordered hover size="sm">
             <thead>
               <tr>
                 <th className="text-center">#</th>
@@ -277,6 +327,20 @@ const GetReport = () => {
           >
             Сформировать отчёт
           </Button>
+          <Button
+            variant="secondary"
+            type="button"
+            onClick={handleDownload}
+            style={{
+              width: "20%",
+              fontSize: "18px",
+              margin: "auto",
+              display: "block",
+              marginLeft: "10px",
+            }}
+          >
+            Скачать отчёт
+          </Button>
         </div>
       </Row>
 
@@ -284,7 +348,6 @@ const GetReport = () => {
         <Row className="mt-3">
           <Col className="table-container">
             <Table
-              striped
               bordered
               hover
               size="sm"
@@ -293,12 +356,14 @@ const GetReport = () => {
               <tbody>
                 {reportData.reportName && (
                   <tr>
-                    <td
-                      colSpan={Object.keys(reportData.data[0]).length}
-                      className="text-center"
-                    >
-                      {reportData.reportName}
-                    </td>
+                    <td>Название отчета:</td>
+                    <td>{reportData.reportName}</td>
+                  </tr>  
+                )}
+                {reportData.reportProvider && (
+                  <tr>
+                    <td>Предоставитель отчета:</td>
+                    <td>{reportData.reportProvider}</td>
                   </tr>
                 )}
                 {reportData.fieldNames && (
@@ -319,16 +384,6 @@ const GetReport = () => {
                     ))}
                   </tr>
                 ))}
-                {reportData.reportProvider && (
-                  <tr>
-                    <td
-                      colSpan={Object.keys(reportData.data[0]).length}
-                      className="text-center"
-                    >
-                      {reportData.reportProvider}
-                    </td>
-                  </tr>
-                )}
               </tbody>
             </Table>
           </Col>

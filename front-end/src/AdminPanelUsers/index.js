@@ -147,7 +147,7 @@ const AdminPanelUsers = () => {
         {isLoading ? (
           <p>Загрузка...</p>
         ) : userProfiles.length > 0 ? (
-          <Table striped bordered hover>
+          <Table bordered hover>
             <thead>
               <tr>
                 <th className="text-center align-middle">#</th>

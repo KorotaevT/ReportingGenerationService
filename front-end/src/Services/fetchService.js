@@ -15,7 +15,24 @@ function ajax(url, requestMethod, jwt, requestBody) {
   }
 
   return fetch(url, fetchData).then((response) => {
-    if (response.status === 200) return response.json();
+    const contentType = response.headers.get("Content-Type");
+
+    if (!response.ok) {
+      return response.json().then((error) => {
+        throw new Error(error.message || "Произошла ошибка при выполнении запроса");
+      });
+    }
+
+    if (contentType && contentType.includes("application/json")) {
+      return response.json();
+    } else if (contentType && (
+      contentType.includes("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") ||
+      contentType.includes("application/octet-stream")
+    )) {
+      return response.blob();
+    } else {
+      throw new Error(`Unsupported content type: ${contentType}`);
+    }
   });
 }
 

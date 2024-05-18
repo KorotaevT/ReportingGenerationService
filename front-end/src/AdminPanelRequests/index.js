@@ -134,7 +134,7 @@ const AdminPanelRequests = () => {
         {isLoading ? (
           <p>Загрузка...</p>
         ) : guestUsers.length > 0 ? (
-          <Table striped bordered hover>
+          <Table bordered hover>
             <thead>
               <tr>
                 <th className="text-center align-middle">#</th>
