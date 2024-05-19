@@ -48,68 +48,15 @@ public class ReportController {
     }
 
     @PostMapping("/getReportDataById")
-    public ResponseEntity<ReportResponseDTO> getReportData(@RequestBody ReportRequestDTO request) {
-        ReportResponseDTO responseDTO = reportService.getReportDataById(request);
+    public ResponseEntity<ReportResponseDTO> getReportData(@RequestBody ReportRequestDTO request, @RequestHeader("Authorization") String token) {
+        ReportResponseDTO responseDTO = reportService.getReportDataById(request, token);
         return ResponseEntity.ok(responseDTO);
     }
 
     @PostMapping("/downloadExcel")
-    public ResponseEntity<byte[]> downloadExcel(@RequestBody ReportRequestDTO request) throws IOException {
+    public ResponseEntity<byte[]> downloadExcel(@RequestBody ReportRequestDTO request, @RequestHeader("Authorization") String token) throws IOException {
 
-        ReportResponseDTO report = reportService.getReportDataById(request);
-
-        Workbook workbook = new XSSFWorkbook();
-        Sheet sheet = workbook.createSheet("Report Data");
-
-        int rowIndex = 0;
-
-        if (report.getReportName() != null) {
-            Row reportNameRow = sheet.createRow(rowIndex++);
-            reportNameRow.createCell(0).setCellValue("Название отчета");
-            reportNameRow.createCell(1).setCellValue(report.getReportName());
-        }
-
-        if (report.getReportProvider() != null) {
-            Row reportProviderRow = sheet.createRow(rowIndex++);
-            reportProviderRow.createCell(0).setCellValue("Предоставитель отчета");
-            reportProviderRow.createCell(1).setCellValue(report.getReportProvider());
-        }
-
-        if (report.isFieldNames() && report.getData() != null && !report.getData().isEmpty()) {
-            Row fieldNamesRow = sheet.createRow(rowIndex++);
-            int cellIndex = 0;
-            for (String fieldName : report.getData().get(0).keySet()) {
-                fieldNamesRow.createCell(cellIndex++).setCellValue(fieldName);
-            }
-        }
-
-        if (report.getData() != null) {
-            for (Map<String, Object> rowData : report.getData()) {
-                Row row = sheet.createRow(rowIndex++);
-                int cellIndex = 0;
-                for (Object value : rowData.values()) {
-                    Cell cell = row.createCell(cellIndex++);
-                    if (value instanceof String) {
-                        cell.setCellValue((String) value);
-                    } else if (value instanceof Integer) {
-                        cell.setCellValue((Integer) value);
-                    } else if (value instanceof Double) {
-                        cell.setCellValue((Double) value);
-                    } else if (value instanceof Boolean) {
-                        cell.setCellValue((Boolean) value);
-                    }
-                }
-            }
-        }
-
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        try {
-            workbook.write(outputStream);
-        } finally {
-            workbook.close();
-        }
-
-        byte[] excelBytes = outputStream.toByteArray();
+        byte[] excelBytes = reportService.downloadExcel(request, token);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));

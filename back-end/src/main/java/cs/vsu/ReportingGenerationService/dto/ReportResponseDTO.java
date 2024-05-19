@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -17,4 +18,6 @@ public class ReportResponseDTO {
     private String reportName;
     private boolean fieldNames;
     private String reportProvider;
+    private Date reportDate;
+    private int recordCount;
 }

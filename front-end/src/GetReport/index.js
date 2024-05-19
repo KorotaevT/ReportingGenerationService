@@ -56,7 +56,13 @@ const GetReport = () => {
       const reportFields = response.fields
         .split(",")
         .map((field) => field.trim())
-        .concat(["Название отчета", "Названия полей", "Предоставитель отчета"])
+        .concat([
+          "Название отчета",
+          "Названия полей",
+          "Предоставитель отчета",
+          "Дата",
+          "Количество",
+        ])
         .map((field) => ({ fieldName: field, isSelected: true }));
 
       setReport({
@@ -69,6 +75,8 @@ const GetReport = () => {
                 "Название отчета",
                 "Названия полей",
                 "Предоставитель отчета",
+                "Дата",
+                "Количество",
               ].includes(field.fieldName)
           ),
           fixed: reportFields.filter((field) =>
@@ -76,6 +84,8 @@ const GetReport = () => {
               "Название отчета",
               "Названия полей",
               "Предоставитель отчета",
+              "Дата",
+              "Количество",
             ].includes(field.fieldName)
           ),
         },
@@ -96,6 +106,8 @@ const GetReport = () => {
                 "Название отчета",
                 "Названия полей",
                 "Предоставитель отчета",
+                "Дата",
+                "Количество",
               ].includes(field.fieldName)
           )
           .map((field) => ({
@@ -109,6 +121,8 @@ const GetReport = () => {
                 "Название отчета",
                 "Названия полей",
                 "Предоставитель отчета",
+                "Дата",
+                "Количество",
               ].includes(field.fieldName)
           )
           .map((field) => ({
@@ -136,6 +150,8 @@ const GetReport = () => {
                 "Название отчета",
                 "Названия полей",
                 "Предоставитель отчета",
+                "Дата",
+                "Количество",
               ].includes(field.fieldName)
           )
           .map((field) => ({
@@ -149,6 +165,8 @@ const GetReport = () => {
                 "Название отчета",
                 "Названия полей",
                 "Предоставитель отчета",
+                "Дата",
+                "Количество",
               ].includes(field.fieldName)
           )
           .map((field) => ({
@@ -156,7 +174,7 @@ const GetReport = () => {
           })),
       },
     };
-  
+
     ajax(`/api/data/downloadExcel`, "POST", user.jwt, reportData)
       .then((blob) => {
         const url = window.URL.createObjectURL(blob);
@@ -171,8 +189,6 @@ const GetReport = () => {
         console.error("Error downloading Excel file:", error);
       });
   };
-  
-
 
   const handleFieldChange = (fieldName) => {
     setFields(
@@ -252,22 +268,29 @@ const GetReport = () => {
               </tr>
             </thead>
             <tbody>
-              {variableFields.map((field, index) => (
-                <tr key={index}>
-                  <td className="text-center">{index + 1}</td>
-                  <td className="text-left">{field.fieldName}</td>
-                  <td className="text-center">
-                    <Form.Check
-                      type="checkbox"
-                      checked={
-                        fields.find((f) => f.fieldName === field.fieldName)
-                          ?.isSelected || false
-                      }
-                      onChange={() => handleFieldChange(field.fieldName)}
-                    />
-                  </td>
-                </tr>
-              ))}
+              {Array.from({ length: maxRows }, (_, index) => {
+                const field = variableFields[index];
+                return (
+                  <tr key={index}>
+                    <td className="text-center">
+                      {field ? index + 1 : "\u00A0"}
+                    </td>
+                    <td className="text-left">{field ? field.fieldName : ""}</td>
+                    <td className="text-center">
+                      {field && (
+                        <Form.Check
+                          type="checkbox"
+                          checked={
+                            fields.find((f) => f.fieldName === field.fieldName)
+                              ?.isSelected || false
+                          }
+                          onChange={() => handleFieldChange(field.fieldName)}
+                        />
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </Table>
         </Col>
@@ -286,7 +309,9 @@ const GetReport = () => {
               {Array.from({ length: maxRows }, (_, index) => {
                 const field = fixedFields[index];
                 return (
-                  <tr key={index}>
+                  <tr
+                    key={index}
+                  >
                     <td className="text-center">
                       {field ? index + 1 : "\u00A0"}
                     </td>
@@ -328,7 +353,7 @@ const GetReport = () => {
             Сформировать отчёт
           </Button>
           <Button
-            variant="secondary"
+            variant="primary"
             type="button"
             onClick={handleDownload}
             style={{
@@ -347,23 +372,32 @@ const GetReport = () => {
       {reportData && (
         <Row className="mt-3">
           <Col className="table-container">
-            <Table
-              bordered
-              hover
-              size="sm"
-              className="fixed-header-table"
-            >
+            <Table bordered hover size="sm" className="fixed-header-table">
               <tbody>
                 {reportData.reportName && (
                   <tr>
                     <td>Название отчета:</td>
                     <td>{reportData.reportName}</td>
-                  </tr>  
+                  </tr>
                 )}
                 {reportData.reportProvider && (
                   <tr>
                     <td>Предоставитель отчета:</td>
                     <td>{reportData.reportProvider}</td>
+                  </tr>
+                )}
+                {reportData.reportDate && (
+                  <tr>
+                    <td>Дата отчета:</td>
+                    <td>
+                      {new Date(reportData.reportDate).toLocaleDateString()}
+                    </td>
+                  </tr>
+                )}
+                {reportData.recordCount > 0 && (
+                  <tr>
+                    <td>Количество записей:</td>
+                    <td>{reportData.recordCount}</td>
                   </tr>
                 )}
                 {reportData.fieldNames && (
