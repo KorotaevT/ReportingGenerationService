@@ -110,6 +110,14 @@ const AdminPanelUsers = () => {
             <Button
               variant="primary"
               onClick={() => {
+                navigateRef.current("/AdminPanelLogs");
+              }}
+            >
+              Журнал
+            </Button>
+            <Button
+              variant="primary"
+              onClick={() => {
                 navigateRef.current("/AdminPanelRequests");
               }}
             >

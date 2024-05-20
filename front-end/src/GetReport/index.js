@@ -5,6 +5,7 @@ import ajax from "../Services/fetchService";
 import { Button, Col, Row, Container, Form, Table } from "react-bootstrap";
 import { useInterval } from "../util/useInterval";
 import validateToken from "../util/tokenValidator";
+import { FaArrowUp, FaArrowDown } from "react-icons/fa";
 import "../App.css";
 
 const GetReport = () => {
@@ -98,32 +99,18 @@ const GetReport = () => {
     const reportData = {
       id: report.id,
       fields: {
-        variable: fields
+        variable: report.fields.variable
           .filter(
             (field) =>
-              field.isSelected &&
-              ![
-                "Название отчета",
-                "Названия полей",
-                "Предоставитель отчета",
-                "Дата",
-                "Количество",
-              ].includes(field.fieldName)
+              fields.find((f) => f.fieldName === field.fieldName)?.isSelected
           )
           .map((field) => ({
             fieldName: field.fieldName,
           })),
-        fixed: fields
+        fixed: report.fields.fixed
           .filter(
             (field) =>
-              field.isSelected &&
-              [
-                "Название отчета",
-                "Названия полей",
-                "Предоставитель отчета",
-                "Дата",
-                "Количество",
-              ].includes(field.fieldName)
+              fields.find((f) => f.fieldName === field.fieldName)?.isSelected
           )
           .map((field) => ({
             fieldName: field.fieldName,
@@ -142,32 +129,18 @@ const GetReport = () => {
     const reportData = {
       id: report.id,
       fields: {
-        variable: fields
+        variable: report.fields.variable
           .filter(
             (field) =>
-              field.isSelected &&
-              ![
-                "Название отчета",
-                "Названия полей",
-                "Предоставитель отчета",
-                "Дата",
-                "Количество",
-              ].includes(field.fieldName)
+              fields.find((f) => f.fieldName === field.fieldName)?.isSelected
           )
           .map((field) => ({
             fieldName: field.fieldName,
           })),
-        fixed: fields
+        fixed: report.fields.fixed
           .filter(
             (field) =>
-              field.isSelected &&
-              [
-                "Название отчета",
-                "Названия полей",
-                "Предоставитель отчета",
-                "Дата",
-                "Количество",
-              ].includes(field.fieldName)
+              fields.find((f) => f.fieldName === field.fieldName)?.isSelected
           )
           .map((field) => ({
             fieldName: field.fieldName,
@@ -198,6 +171,37 @@ const GetReport = () => {
           : field
       )
     );
+  };
+
+  const moveField = (index, direction, isVariable) => {
+    const targetIndex = index + direction;
+    if (isVariable) {
+      if (targetIndex >= 0 && targetIndex < report.fields.variable.length) {
+        const newFields = [...report.fields.variable];
+        const [movedField] = newFields.splice(index, 1);
+        newFields.splice(targetIndex, 0, movedField);
+        setReport((prevReport) => ({
+          ...prevReport,
+          fields: {
+            ...prevReport.fields,
+            variable: newFields,
+          },
+        }));
+      }
+    } else {
+      if (targetIndex >= 0 && targetIndex < report.fields.fixed.length) {
+        const newFields = [...report.fields.fixed];
+        const [movedField] = newFields.splice(index, 1);
+        newFields.splice(targetIndex, 0, movedField);
+        setReport((prevReport) => ({
+          ...prevReport,
+          fields: {
+            ...prevReport.fields,
+            fixed: newFields,
+          },
+        }));
+      }
+    }
   };
 
   const variableFields = useMemo(() => {
@@ -265,28 +269,43 @@ const GetReport = () => {
                 <th className="text-center">#</th>
                 <th className="text-center">Поле</th>
                 <th className="text-center">Выбрано</th>
+                <th className="text-center">Перемещение</th>
               </tr>
             </thead>
             <tbody>
-              {Array.from({ length: maxRows }, (_, index) => {
+              {Array.from({ length: variableFields.length }, (_, index) => {
                 const field = variableFields[index];
                 return (
                   <tr key={index}>
+                    <td className="text-center">{index + 1}</td>
+                    <td className="text-left">{field.fieldName}</td>
                     <td className="text-center">
-                      {field ? index + 1 : "\u00A0"}
+                      <Form.Check
+                        type="checkbox"
+                        checked={
+                          fields.find((f) => f.fieldName === field.fieldName)
+                            ?.isSelected || false
+                        }
+                        onChange={() => handleFieldChange(field.fieldName)}
+                      />
                     </td>
-                    <td className="text-left">{field ? field.fieldName : ""}</td>
                     <td className="text-center">
-                      {field && (
-                        <Form.Check
-                          type="checkbox"
-                          checked={
-                            fields.find((f) => f.fieldName === field.fieldName)
-                              ?.isSelected || false
-                          }
-                          onChange={() => handleFieldChange(field.fieldName)}
-                        />
-                      )}
+                      <div className="d-flex justify-content-center">
+                        <Button
+                          variant="link"
+                          onClick={() => moveField(index, -1, true)}
+                          disabled={index === 0}
+                        >
+                          <FaArrowUp />
+                        </Button>
+                        <Button
+                          variant="link"
+                          onClick={() => moveField(index, 1, true)}
+                          disabled={index === variableFields.length - 1}
+                        >
+                          <FaArrowDown />
+                        </Button>
+                      </div>
                     </td>
                   </tr>
                 );
@@ -303,32 +322,43 @@ const GetReport = () => {
                 <th className="text-center">#</th>
                 <th className="text-center">Поле</th>
                 <th className="text-center">Выбрано</th>
+                <th className="text-center">Перемещение</th>
               </tr>
             </thead>
             <tbody>
-              {Array.from({ length: maxRows }, (_, index) => {
+              {Array.from({ length: fixedFields.length }, (_, index) => {
                 const field = fixedFields[index];
                 return (
-                  <tr
-                    key={index}
-                  >
+                  <tr key={index}>
+                    <td className="text-center">{index + 1}</td>
+                    <td className="text-left">{field.fieldName}</td>
                     <td className="text-center">
-                      {field ? index + 1 : "\u00A0"}
-                    </td>
-                    <td className="text-left">
-                      {field ? field.fieldName : ""}
+                      <Form.Check
+                        type="checkbox"
+                        checked={
+                          fields.find((f) => f.fieldName === field.fieldName)
+                            ?.isSelected || false
+                        }
+                        onChange={() => handleFieldChange(field.fieldName)}
+                      />
                     </td>
                     <td className="text-center">
-                      {field && (
-                        <Form.Check
-                          type="checkbox"
-                          checked={
-                            fields.find((f) => f.fieldName === field.fieldName)
-                              ?.isSelected || false
-                          }
-                          onChange={() => handleFieldChange(field.fieldName)}
-                        />
-                      )}
+                      <div className="d-flex justify-content-center">
+                        <Button
+                          variant="link"
+                          onClick={() => moveField(index, -1, false)}
+                          disabled={index === 0}
+                        >
+                          <FaArrowUp />
+                        </Button>
+                        <Button
+                          variant="link"
+                          onClick={() => moveField(index, 1, false)}
+                          disabled={index === fixedFields.length - 1}
+                        >
+                          <FaArrowDown />
+                        </Button>
+                      </div>
                     </td>
                   </tr>
                 );

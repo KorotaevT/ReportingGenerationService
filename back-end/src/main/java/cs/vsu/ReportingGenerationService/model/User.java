@@ -32,6 +32,10 @@ public class User implements UserDetails {
     @JsonIgnore
     private List<Authority> authorities = new ArrayList<>();
 
+    @OneToMany(mappedBy = "user")
+    @JsonIgnore
+    private List<ReportRequest> reportRequests;
+
     @Override
     public String getUsername(){
         return username;

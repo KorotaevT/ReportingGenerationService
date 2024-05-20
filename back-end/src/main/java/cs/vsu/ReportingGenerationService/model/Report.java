@@ -1,10 +1,13 @@
 package cs.vsu.ReportingGenerationService.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Entity
 @Table(name="report")
@@ -29,5 +32,9 @@ public class Report {
     private String fields;
 
     private String query;
+
+    @OneToMany(mappedBy = "report")
+    @JsonIgnore
+    private List<ReportRequest> reportRequests;
 
 }

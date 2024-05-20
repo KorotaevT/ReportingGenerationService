@@ -5,13 +5,14 @@ import { useUser } from "../UserProvider";
 import { useInterval } from "../util/useInterval";
 import validateToken from "../util/tokenValidator";
 import ajax from "../Services/fetchService";
+import { format } from "date-fns";
 
-const AdminPanelRequests = () => {
+const AdminPanelLogs = () => {
   const user = useUser();
   const navigate = useNavigate();
   const userRef = useRef(user);
   const navigateRef = useRef(navigate);
-  const [guestUsers, setGuestUsers] = useState([]);
+  const [logs, setLogs] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -41,45 +42,11 @@ const AdminPanelRequests = () => {
 
   useEffect(() => {
     setIsLoading(true);
-    ajax(`/api/admin/getAuthRequests`, "GET", user.jwt).then((response) => {
-      setGuestUsers(response.sort((a, b) => a.registrationDate.localeCompare(b.registrationDate)));
+    ajax(`/api/admin/getLogs`, "GET", user.jwt).then((response) => {
+      setLogs(response);
       setIsLoading(false);
     });
   }, []);
-
-  const handleApprove = (userId) => {
-    const userToApprove = guestUsers.find(
-      (guestUser) => guestUser.id === userId
-    );
-    ajax(
-      `/api/admin/approveAuthRequest`,
-      "PATCH",
-      user.jwt,
-      userToApprove
-    ).then(() => {
-      const updatedGuestUsers = guestUsers.filter(
-        (guestUser) => guestUser.id !== userId
-      );
-      setGuestUsers(updatedGuestUsers);
-    });
-  };
-
-  const handleReject = (userId) => {
-    const userToReject = guestUsers.find(
-      (guestUser) => guestUser.id === userId
-    );
-    ajax(
-      `/api/admin/rejectAuthRequest`,
-      "DELETE",
-      user.jwt,
-      userToReject
-    ).then(() => {
-      const updatedGuestUsers = guestUsers.filter(
-        (guestUser) => guestUser.id !== userId
-      );
-      setGuestUsers(updatedGuestUsers);
-    });
-  };
 
   return (
     <Container>
@@ -93,6 +60,14 @@ const AdminPanelRequests = () => {
               }}
             >
               Назад
+            </Button>
+            <Button
+              variant="primary"
+              onClick={() => {
+                navigateRef.current("/AdminPanelRequests");
+              }}
+            >
+              Запросы
             </Button>
             <Button
               variant="primary"
@@ -111,14 +86,6 @@ const AdminPanelRequests = () => {
               Пользователи
             </Button>
             <Button
-              variant="primary"
-              onClick={() => {
-                navigateRef.current("/AdminPanelLogs");
-              }}
-            >
-              Журнал
-            </Button>
-            <Button
               variant="danger"
               onClick={() => {
                 userRef.current.setJwt(null);
@@ -134,49 +101,31 @@ const AdminPanelRequests = () => {
       <Row className="mt-4">
         <Col>
           <div className="h1 d-flex justify-content-center align-items-center">
-            Запросы на регистрацию
+            Журнал запросов
           </div>
         </Col>
       </Row>
       <div className="mt-4 report-wrapper report">
         {isLoading ? (
           <p>Загрузка...</p>
-        ) : guestUsers.length > 0 ? (
+        ) : logs.length > 0 ? (
           <Table bordered hover>
             <thead>
               <tr>
                 <th className="text-center align-middle">#</th>
                 <th className="text-center align-middle">ФИО</th>
-                <th className="text-center align-middle">Дата регистрации</th>
-                <th className="text-center align-middle">Действия</th>
+                <th className="text-center align-middle">Дата получения отчёта</th>
               </tr>
             </thead>
             <tbody>
-              {guestUsers.map((guestUser, index) => (
-                <tr key={guestUser.id}>
+              {logs.map((log, index) => (
+                <tr key={log.id}>
                   <td className="text-center align-middle">{index + 1}</td>
                   <td className="text-center align-middle">
-                    {guestUser.username}
+                    {log.user ? log.user.username : ""}
                   </td>
                   <td className="text-center align-middle">
-                    {guestUser.registrationDate}
-                  </td>
-
-                  <td className="d-flex justify-content-center">
-                    <Button
-                      variant="success"
-                      className="mx-1"
-                      onClick={() => handleApprove(guestUser.id)}
-                    >
-                      Подтвердить
-                    </Button>{" "}
-                    <Button
-                      variant="danger"
-                      className="mx-1"
-                      onClick={() => handleReject(guestUser.id)}
-                    >
-                      Отклонить
-                    </Button>
+                    {format(new Date(log.requestTime), "yyyy-MM-dd HH:mm")}
                   </td>
                 </tr>
               ))}
@@ -190,4 +139,4 @@ const AdminPanelRequests = () => {
   );
 };
 
-export default AdminPanelRequests;
+export default AdminPanelLogs;

@@ -4,9 +4,11 @@ import cs.vsu.ReportingGenerationService.dto.UserDTO;
 import cs.vsu.ReportingGenerationService.enums.Role;
 import cs.vsu.ReportingGenerationService.model.Authority;
 import cs.vsu.ReportingGenerationService.model.Report;
+import cs.vsu.ReportingGenerationService.model.ReportRequest;
 import cs.vsu.ReportingGenerationService.model.User;
 import cs.vsu.ReportingGenerationService.service.AdminService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -147,5 +149,11 @@ public class AdminController {
         response.put("success", true);
         response.put("data", null);
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/getLogs")
+    @ResponseStatus(HttpStatus.OK)
+    public List<ReportRequest> getLogs() {
+        return adminService.getReportRequests().orElseThrow();
     }
 }

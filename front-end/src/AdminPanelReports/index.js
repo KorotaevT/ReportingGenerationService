@@ -69,6 +69,14 @@ const AdminPanelReports = () => {
             <Button
               variant="primary"
               onClick={() => {
+                navigateRef.current("/AdminPanelLogs");
+              }}
+            >
+              Журнал
+            </Button>
+            <Button
+              variant="primary"
+              onClick={() => {
                 navigateRef.current("/AdminPanelRequests");
               }}
             >
@@ -87,7 +95,7 @@ const AdminPanelReports = () => {
         </Col>
       </Row>
 
-      <Row className="mt-2">
+      <Row className="mt-4">
         <Col>
           <div className="h1 d-flex justify-content-center align-items-center">
             Редактирование отчётов

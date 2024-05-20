@@ -4,9 +4,11 @@ import cs.vsu.ReportingGenerationService.dto.UserDTO;
 import cs.vsu.ReportingGenerationService.enums.Role;
 import cs.vsu.ReportingGenerationService.model.Authority;
 import cs.vsu.ReportingGenerationService.model.Report;
+import cs.vsu.ReportingGenerationService.model.ReportRequest;
 import cs.vsu.ReportingGenerationService.model.User;
 import cs.vsu.ReportingGenerationService.repository.AuthorityRepository;
 import cs.vsu.ReportingGenerationService.repository.ReportRepository;
+import cs.vsu.ReportingGenerationService.repository.ReportRequestRepository;
 import cs.vsu.ReportingGenerationService.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +27,8 @@ public class AdminService {
 
     private final AuthorityRepository authorityRepository;
 
+    private final ReportRequestRepository reportRequestRepository;
+
     private final ReportRepository reportRepository;
 
     public Optional<List<User>> getAuthRequests() {
@@ -36,6 +40,8 @@ public class AdminService {
     }
 
     public Optional<List<Report>> getReports() {return Optional.ofNullable(reportRepository.findAll());}
+
+    public Optional<List<ReportRequest>> getReportRequests() {return Optional.ofNullable(reportRequestRepository.findAllByOrderByRequestTimeDesc());}
 
     public Optional<Report> getReportById(Long id) {return reportRepository.findById(id);}
 

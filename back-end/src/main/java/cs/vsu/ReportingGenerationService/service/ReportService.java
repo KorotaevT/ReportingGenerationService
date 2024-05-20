@@ -5,15 +5,19 @@ import cs.vsu.ReportingGenerationService.dto.FieldSelectionDTO;
 import cs.vsu.ReportingGenerationService.dto.ReportRequestDTO;
 import cs.vsu.ReportingGenerationService.dto.ReportResponseDTO;
 import cs.vsu.ReportingGenerationService.model.Report;
+import cs.vsu.ReportingGenerationService.model.ReportRequest;
+import cs.vsu.ReportingGenerationService.model.User;
 import cs.vsu.ReportingGenerationService.repository.ReportRepository;
+import cs.vsu.ReportingGenerationService.repository.ReportRequestRepository;
+import cs.vsu.ReportingGenerationService.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -21,6 +25,10 @@ import java.util.*;
 public class ReportService {
 
     private final ReportRepository reportRepository;
+
+    private final ReportRequestRepository reportRequestRepository;
+
+    private final UserRepository userRepository;
 
     private final DynamicTableReader dynamicTableReader;
 
@@ -66,6 +74,17 @@ public class ReportService {
             }
         }
 
+        String curJwt = token.substring(7);
+        User curUser = userRepository.findByUsername(jwtService.extractUsername(curJwt)).orElseThrow();
+
+        ReportRequest curReportRequest = ReportRequest.builder()
+                .user(curUser)
+                .report(report.orElseThrow())
+                .requestTime(LocalDateTime.now())
+                .build();
+
+        reportRequestRepository.save(curReportRequest);
+
         return ReportResponseDTO.builder()
                 .data(data)
                 .reportName(reportName)
@@ -85,41 +104,48 @@ public class ReportService {
 
         int rowIndex = 0;
 
-        if (report.getReportName() != null) {
-            Row reportNameRow = sheet.createRow(rowIndex++);
-            reportNameRow.createCell(0).setCellValue("Название отчета:");
-            reportNameRow.createCell(1).setCellValue(report.getReportName());
-        }
+        for (FieldSelectionDTO fieldSelectionDTO : request.getFields().getOrDefault("fixed", Collections.emptyList())) {
 
-        if (report.getReportProvider() != null) {
-            Row reportProviderRow = sheet.createRow(rowIndex++);
-            reportProviderRow.createCell(0).setCellValue("Предоставитель отчета:");
-            reportProviderRow.createCell(1).setCellValue(report.getReportProvider());
-        }
+            if (Objects.equals(fieldSelectionDTO.getFieldName(), "Название отчета") && report.getReportName() != null) {
+                Row reportNameRow = sheet.createRow(rowIndex++);
+                reportNameRow.createCell(0).setCellValue("Название отчета:");
+                reportNameRow.createCell(1).setCellValue(report.getReportName());
+                continue;
+            }
 
-        CellStyle dateCellStyle = workbook.createCellStyle();
-        CreationHelper createHelper = workbook.getCreationHelper();
-        dateCellStyle.setDataFormat(createHelper.createDataFormat().getFormat("dd.MM.yyyy"));
+            if (Objects.equals(fieldSelectionDTO.getFieldName(), "Предоставитель отчета") && report.getReportProvider() != null) {
+                Row reportProviderRow = sheet.createRow(rowIndex++);
+                reportProviderRow.createCell(0).setCellValue("Предоставитель отчета:");
+                reportProviderRow.createCell(1).setCellValue(report.getReportProvider());
+                continue;
+            }
 
-        if (report.getReportDate() != null) {
-            Row reportDateRow = sheet.createRow(rowIndex++);
-            reportDateRow.createCell(0).setCellValue("Дата отчета:");
-            Cell dateCell = reportDateRow.createCell(1);
-            dateCell.setCellValue(report.getReportDate());
-            dateCell.setCellStyle(dateCellStyle);
-        }
+            CellStyle dateCellStyle = workbook.createCellStyle();
+            CreationHelper createHelper = workbook.getCreationHelper();
+            dateCellStyle.setDataFormat(createHelper.createDataFormat().getFormat("dd.MM.yyyy"));
 
-        if (report.getRecordCount() != -1) {
-            Row reportProviderRow = sheet.createRow(rowIndex++);
-            reportProviderRow.createCell(0).setCellValue("Количество записей:");
-            reportProviderRow.createCell(1).setCellValue(report.getRecordCount());
-        }
+            if (Objects.equals(fieldSelectionDTO.getFieldName(), "Дата") && report.getReportDate() != null) {
+                Row reportDateRow = sheet.createRow(rowIndex++);
+                reportDateRow.createCell(0).setCellValue("Дата отчета:");
+                Cell dateCell = reportDateRow.createCell(1);
+                dateCell.setCellValue(report.getReportDate());
+                dateCell.setCellStyle(dateCellStyle);
+                continue;
+            }
 
-        if (report.isFieldNames() && report.getData() != null && !report.getData().isEmpty()) {
-            Row fieldNamesRow = sheet.createRow(rowIndex++);
-            int cellIndex = 0;
-            for (String fieldName : report.getData().get(0).keySet()) {
-                fieldNamesRow.createCell(cellIndex++).setCellValue(fieldName);
+            if (Objects.equals(fieldSelectionDTO.getFieldName(), "Количество") && report.getRecordCount() != -1) {
+                Row reportProviderRow = sheet.createRow(rowIndex++);
+                reportProviderRow.createCell(0).setCellValue("Количество записей:");
+                reportProviderRow.createCell(1).setCellValue(report.getRecordCount());
+                continue;
+            }
+
+            if (Objects.equals(fieldSelectionDTO.getFieldName(), "Названия полей") && report.isFieldNames() && report.getData() != null && !report.getData().isEmpty()) {
+                Row fieldNamesRow = sheet.createRow(rowIndex++);
+                int cellIndex = 0;
+                for (String fieldName : report.getData().get(0).keySet()) {
+                    fieldNamesRow.createCell(cellIndex++).setCellValue(fieldName);
+                }
             }
         }
 

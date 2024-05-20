@@ -16,7 +16,7 @@ import java.util.*;
 @Component
 public class DynamicTableReader {
 
-    public List<Map<String,Object>> getReportData(ReportRequestDTO request, Optional<Report> report) {
+    public List<Map<String, Object>> getReportData(ReportRequestDTO request, Optional<Report> report) {
 
         List<Map<String, Object>> data = new ArrayList<>();
 
@@ -26,7 +26,7 @@ public class DynamicTableReader {
                 ResultSet resultSet = statement.executeQuery(report.get().getQuery());
 
                 while (resultSet.next()) {
-                    Map<String, Object> row = new HashMap<>();
+                    Map<String, Object> row = new LinkedHashMap<>();
 
                     for (Map.Entry<String, List<FieldSelectionDTO>> entry : request.getFields().entrySet()) {
                         if ("variable".equals(entry.getKey())) {
@@ -47,3 +47,4 @@ public class DynamicTableReader {
         return data;
     }
 }
+
