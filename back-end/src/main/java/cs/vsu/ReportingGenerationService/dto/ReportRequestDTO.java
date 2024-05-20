@@ -13,6 +13,8 @@ import java.util.Map;
 @AllArgsConstructor
 @RequiredArgsConstructor
 public class ReportRequestDTO {
+
     private Long id;
     private Map<String, List<FieldSelectionDTO>> fields;
+
 }

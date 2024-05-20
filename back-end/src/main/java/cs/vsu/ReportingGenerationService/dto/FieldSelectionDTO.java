@@ -10,5 +10,7 @@ import lombok.RequiredArgsConstructor;
 @AllArgsConstructor
 @RequiredArgsConstructor
 public class FieldSelectionDTO {
+
     private String fieldName;
+
 }

@@ -3,7 +3,13 @@ package cs.vsu.ReportingGenerationService.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import cs.vsu.ReportingGenerationService.enums.Role;
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

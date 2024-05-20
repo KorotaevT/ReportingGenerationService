@@ -2,7 +2,6 @@ package cs.vsu.ReportingGenerationService.dao;
 
 import cs.vsu.ReportingGenerationService.dto.FieldSelectionDTO;
 import cs.vsu.ReportingGenerationService.dto.ReportRequestDTO;
-import cs.vsu.ReportingGenerationService.dto.ReportResponseDTO;
 import cs.vsu.ReportingGenerationService.model.Report;
 import org.springframework.stereotype.Component;
 
@@ -11,7 +10,11 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.LinkedHashMap;
 
 @Component
 public class DynamicTableReader {
@@ -46,5 +49,5 @@ public class DynamicTableReader {
 
         return data;
     }
-}
 
+}

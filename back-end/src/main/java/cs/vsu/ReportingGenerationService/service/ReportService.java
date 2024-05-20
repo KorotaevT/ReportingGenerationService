@@ -11,14 +11,24 @@ import cs.vsu.ReportingGenerationService.repository.ReportRepository;
 import cs.vsu.ReportingGenerationService.repository.ReportRequestRepository;
 import cs.vsu.ReportingGenerationService.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.CreationHelper;
+import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
+import java.util.Date;
+import java.util.Map;
+import java.util.Collections;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -70,7 +80,7 @@ public class ReportService {
                     reportProvider = jwtService.extractUsername(curJwt);
                 }
                 case "Дата" -> reportDate = new Date();
-                case "Количество" -> recordCount = data.size();
+                case "Количество записей" -> recordCount = data.size();
             }
         }
 
@@ -133,7 +143,7 @@ public class ReportService {
                 continue;
             }
 
-            if (Objects.equals(fieldSelectionDTO.getFieldName(), "Количество") && report.getRecordCount() != -1) {
+            if (Objects.equals(fieldSelectionDTO.getFieldName(), "Количество записей") && report.getRecordCount() != -1) {
                 Row reportProviderRow = sheet.createRow(rowIndex++);
                 reportProviderRow.createCell(0).setCellValue("Количество записей:");
                 reportProviderRow.createCell(1).setCellValue(report.getRecordCount());
@@ -186,5 +196,5 @@ public class ReportService {
         report.setUrl(null);
         report.setQuery(null);
     }
-}
 
+}

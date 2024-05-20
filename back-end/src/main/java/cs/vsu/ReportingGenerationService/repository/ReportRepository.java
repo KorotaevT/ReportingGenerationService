@@ -13,4 +13,5 @@ public interface ReportRepository  extends JpaRepository<Report, Integer> {
     Optional<Report> findById(Long id);
 
     void deleteById(Long id);
+
 }

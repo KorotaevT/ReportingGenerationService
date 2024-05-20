@@ -8,11 +8,22 @@ import cs.vsu.ReportingGenerationService.model.ReportRequest;
 import cs.vsu.ReportingGenerationService.model.User;
 import cs.vsu.ReportingGenerationService.service.AdminService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
+
 
 @RestController
 @RequiredArgsConstructor
@@ -152,8 +163,8 @@ public class AdminController {
     }
 
     @GetMapping("/getLogs")
-    @ResponseStatus(HttpStatus.OK)
-    public List<ReportRequest> getLogs() {
-        return adminService.getReportRequests().orElseThrow();
+    public ResponseEntity<List<ReportRequest>> getLogs() {
+        return ResponseEntity.ok(adminService.getReportRequests().orElseThrow());
     }
+
 }

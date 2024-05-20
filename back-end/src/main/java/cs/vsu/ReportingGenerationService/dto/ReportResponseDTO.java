@@ -14,10 +14,12 @@ import java.util.Map;
 @AllArgsConstructor
 @RequiredArgsConstructor
 public class ReportResponseDTO {
+
     private List<Map<String, Object>> data;
     private String reportName;
     private boolean fieldNames;
     private String reportProvider;
     private Date reportDate;
     private int recordCount;
+
 }

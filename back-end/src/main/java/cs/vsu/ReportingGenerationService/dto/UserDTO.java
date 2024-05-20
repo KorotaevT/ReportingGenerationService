@@ -12,6 +12,8 @@ import lombok.RequiredArgsConstructor;
 @AllArgsConstructor
 @RequiredArgsConstructor
 public class UserDTO {
+
     private User user;
     private Role role;
+
 }

@@ -1,6 +1,5 @@
 package cs.vsu.ReportingGenerationService.filters;
 
-import cs.vsu.ReportingGenerationService.repository.UserRepository;
 import cs.vsu.ReportingGenerationService.service.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -48,4 +47,5 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
         filterChain.doFilter(request, response);
     }
+
 }

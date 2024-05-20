@@ -59,10 +59,10 @@ const GetReport = () => {
         .map((field) => field.trim())
         .concat([
           "Название отчета",
-          "Названия полей",
           "Предоставитель отчета",
           "Дата",
-          "Количество",
+          "Количество записей",
+          "Названия полей",
         ])
         .map((field) => ({ fieldName: field, isSelected: true }));
 
@@ -74,19 +74,19 @@ const GetReport = () => {
             (field) =>
               ![
                 "Название отчета",
-                "Названия полей",
                 "Предоставитель отчета",
                 "Дата",
-                "Количество",
+                "Количество записей",
+                "Названия полей",
               ].includes(field.fieldName)
           ),
           fixed: reportFields.filter((field) =>
             [
               "Название отчета",
-              "Названия полей",
               "Предоставитель отчета",
               "Дата",
-              "Количество",
+              "Количество записей",
+              "Названия полей",
             ].includes(field.fieldName)
           ),
         },
@@ -120,7 +120,8 @@ const GetReport = () => {
 
     ajax(`/api/data/getReportDataById`, "POST", user.jwt, reportData).then(
       (response) => {
-        setReportData(response);
+        const sortedFixedFields = sortFixedFields(fields, response);
+        setReportData({ ...response, sortedFixedFields });
       }
     );
   };
@@ -204,6 +205,53 @@ const GetReport = () => {
     }
   };
 
+  const sortFixedFields = (fields, reportData) => {
+    const fixedFieldOrder = report.fields.fixed.map((field) => field.fieldName);
+    const sortedFixedFields = fixedFieldOrder
+      .map((fieldName) => {
+        switch (fieldName) {
+          case "Название отчета":
+            return {
+              key: "reportName",
+              label: "Название отчета",
+              value: reportData.reportName,
+            };
+          case "Предоставитель отчета":
+            return {
+              key: "reportProvider",
+              label: "Предоставитель отчета",
+              value: reportData.reportProvider,
+            };
+          case "Дата":
+            return {
+              key: "reportDate",
+              label: "Дата",
+              value: new Date(reportData.reportDate).toLocaleDateString(),
+            };
+          case "Количество записей":
+            return {
+              key: "recordCount",
+              label: "Количество записей",
+              value: reportData.recordCount,
+            };
+          case "Названия полей":
+            return {
+              key: "fieldNames",
+              label: "Названия полей",
+              value: Object.keys(reportData.data[0]),
+            };
+          default:
+            return null;
+        }
+      })
+      .filter(
+        (field) =>
+          field && fields.find((f) => f.fieldName === field.label)?.isSelected
+      );
+
+    return sortedFixedFields;
+  };
+
   const variableFields = useMemo(() => {
     return (
       report?.fields?.variable.map((field) => ({
@@ -219,14 +267,6 @@ const GetReport = () => {
       })) || []
     );
   }, [report]);
-
-  const maxRows = useMemo(() => {
-    return Math.max(variableFields.length, fixedFields.length);
-  }, [variableFields, fixedFields]);
-
-  if (!report) {
-    return <div>Загрузка...</div>;
-  }
 
   return (
     <Container className="create-report-container">
@@ -398,48 +438,44 @@ const GetReport = () => {
           </Button>
         </div>
       </Row>
-
       {reportData && (
         <Row className="mt-3">
           <Col className="table-container">
             <Table bordered hover size="sm" className="fixed-header-table">
               <tbody>
-                {reportData.reportName && (
-                  <tr>
-                    <td>Название отчета:</td>
-                    <td>{reportData.reportName}</td>
-                  </tr>
-                )}
-                {reportData.reportProvider && (
-                  <tr>
-                    <td>Предоставитель отчета:</td>
-                    <td>{reportData.reportProvider}</td>
-                  </tr>
-                )}
-                {reportData.reportDate && (
-                  <tr>
-                    <td>Дата отчета:</td>
-                    <td>
-                      {new Date(reportData.reportDate).toLocaleDateString()}
-                    </td>
-                  </tr>
-                )}
-                {reportData.recordCount > 0 && (
-                  <tr>
-                    <td>Количество записей:</td>
-                    <td>{reportData.recordCount}</td>
-                  </tr>
-                )}
-                {reportData.fieldNames && (
-                  <tr>
-                    {Object.keys(reportData.data[0]).map((field, index) => (
-                      <td key={index} className="text-center">
-                        {field}
-                      </td>
-                    ))}
-                  </tr>
-                )}
-                {reportData.data.map((row, rowIndex) => (
+                {reportData?.sortedFixedFields?.map((field, index) => {
+                  if (field.key === "fieldNames") {
+                    return (
+                      <tr key={index}>
+                        {field.value.map((fieldName, fieldIndex) => (
+                          <td key={fieldIndex} className="text-center">
+                            {fieldName}
+                          </td>
+                        ))}
+                      </tr>
+                    );
+                  } else {
+                    return (
+                      <tr key={index}>
+                        <td>{field.label}:</td>
+                        <td>{field.value}</td>
+                      </tr>
+                    );
+                  }
+                })}
+                {reportData?.data?.length > 0 &&
+                  reportData.sortedFixedFields.every(
+                    (field) => field.key !== "fieldNames"
+                  ) && (
+                    <tr>
+                      {Object.keys(reportData.data[0]).map((field, index) => (
+                        <td key={index} className="text-center">
+                          {field}
+                        </td>
+                      ))}
+                    </tr>
+                  )}
+                {reportData?.data.map((row, rowIndex) => (
                   <tr key={rowIndex}>
                     {Object.values(row).map((value, colIndex) => (
                       <td key={colIndex} className="text-center">
