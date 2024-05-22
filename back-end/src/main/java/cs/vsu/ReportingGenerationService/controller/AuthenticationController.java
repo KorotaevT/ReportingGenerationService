@@ -7,6 +7,8 @@ import cs.vsu.ReportingGenerationService.util.AuthenticationRequest;
 import cs.vsu.ReportingGenerationService.util.AuthenticationResponse;
 import cs.vsu.ReportingGenerationService.util.RegisterRequest;
 import io.jsonwebtoken.ExpiredJwtException;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -23,11 +25,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
+@Tag(name = "Контроллер аутентификации", description = "API для аутентификации и регистрации пользователей")
 public class AuthenticationController {
     private final AuthenticationService authenticationService;
     private final JwtService jwtService;
 
     @PostMapping("/registration")
+    @Operation(summary = "Регистрация пользователя", description = "Регистрирует нового пользователя и возвращает токен авторизации и данные пользователя")
     public ResponseEntity<?> register(
             @RequestBody RegisterRequest request
     ) {
@@ -51,6 +55,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/authentication")
+    @Operation(summary = "Аутентификация пользователя", description = "Аутентифицирует пользователя по логину и паролю и возвращает токен авторизации и данные пользователя")
     public ResponseEntity<?> authenticate(
             @RequestBody AuthenticationRequest request
     ) {
@@ -74,6 +79,7 @@ public class AuthenticationController {
     }
 
     @GetMapping("/validation")
+    @Operation(summary = "Проверка токена", description = "Проверяет действительность токена авторизации")
     public ResponseEntity<?> validateToken(@RequestParam String token, @AuthenticationPrincipal User user){
         try {
             boolean isTokenValid = jwtService.isTokenValid(token, user);

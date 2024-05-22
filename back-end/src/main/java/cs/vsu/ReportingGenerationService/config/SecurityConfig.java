@@ -29,9 +29,9 @@ public class SecurityConfig {
                 .csrf()
                 .disable()
                 .authorizeHttpRequests()
-                .requestMatchers(HttpMethod.OPTIONS)
+                .requestMatchers(WHITELIST)
                 .permitAll()
-                .requestMatchers("api/auth/**")
+                .requestMatchers(HttpMethod.OPTIONS)
                 .permitAll()
                 .requestMatchers("api/admin/**")
                 .hasAuthority("ADMIN")
@@ -58,5 +58,14 @@ public class SecurityConfig {
             }
         };
     }
+
+
+    private static final String[] WHITELIST = {
+            "/api/auth/**",
+            "/v3/api-docs/**",
+            "/v3/api-docs.yaml",
+            "/swagger-ui/**",
+            "/swagger-ui.html"
+    };
 
 }

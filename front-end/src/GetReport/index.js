@@ -463,18 +463,6 @@ const GetReport = () => {
                     );
                   }
                 })}
-                {reportData?.data?.length > 0 &&
-                  reportData.sortedFixedFields.every(
-                    (field) => field.key !== "fieldNames"
-                  ) && (
-                    <tr>
-                      {Object.keys(reportData.data[0]).map((field, index) => (
-                        <td key={index} className="text-center">
-                          {field}
-                        </td>
-                      ))}
-                    </tr>
-                  )}
                 {reportData?.data.map((row, rowIndex) => (
                   <tr key={rowIndex}>
                     {Object.values(row).map((value, colIndex) => (
