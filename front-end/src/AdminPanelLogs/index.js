@@ -46,7 +46,7 @@ const AdminPanelLogs = () => {
       setLogs(response);
       setIsLoading(false);
     });
-  }, []);
+  }, [user.jwt]);
 
   return (
     <Container>
@@ -115,6 +115,7 @@ const AdminPanelLogs = () => {
                 <th className="text-center align-middle">#</th>
                 <th className="text-center align-middle">ФИО</th>
                 <th className="text-center align-middle">Дата получения отчёта</th>
+                <th className="text-center align-middle">Название отчёта</th>
               </tr>
             </thead>
             <tbody>
@@ -126,6 +127,9 @@ const AdminPanelLogs = () => {
                   </td>
                   <td className="text-center align-middle">
                     {format(new Date(log.requestTime), "yyyy-MM-dd HH:mm")}
+                  </td>
+                  <td className="text-center align-middle">
+                    {log.report ? log.report.name : "Неизвестно"}
                   </td>
                 </tr>
               ))}

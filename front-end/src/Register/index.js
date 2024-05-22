@@ -49,7 +49,7 @@ const Login = () => {
     <MDBContainer
       fluid
       style={{
-        backgroundColor: "#508bfc",
+        backgroundColor: "#ffffff",
         height: "100vh",
         overflow: "hidden",
       }}
@@ -58,7 +58,11 @@ const Login = () => {
         <MDBCol col="12">
           <MDBCard
             className="bg-white my-5 mx-auto"
-            style={{ borderRadius: "1rem", maxWidth: "500px" }}
+            style={{
+              borderRadius: "1rem",
+              maxWidth: "500px",
+              border: "8px solid #508bfc",
+            }}
           >
             <MDBCardBody className="p-5 w-100 d-flex flex-column">
               <h2 className="fw-bold mb-2 text-center">Регистрация</h2>
@@ -73,6 +77,7 @@ const Login = () => {
                 value={username}
                 placeholder="Введите ваше ФИО"
                 onChange={(event) => setUsername(event.target.value)}
+                style={{ border: "2px solid #ccc" }}
               />
               <MDBInput
                 wrapperClass="mb-4 w-100"
@@ -81,6 +86,7 @@ const Login = () => {
                 value={password}
                 placeholder="Введите пароль"
                 onChange={(event) => setPassword(event.target.value)}
+                style={{ border: "2px solid #ccc" }}
               />
 
               <Button

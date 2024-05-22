@@ -1,4 +1,4 @@
-import React, {useState } from "react";
+import React, { useState } from "react";
 import { Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../UserProvider";
@@ -48,18 +48,20 @@ const Login = () => {
     <MDBContainer
       fluid
       style={{
-        backgroundColor: "#508bfc",
+        backgroundColor: "#ffffff",
         height: "100vh",
         overflow: "hidden",
       }}
     >
       <MDBRow className="d-flex justify-content-center align-items-center h-100">
-
-
         <MDBCol col="12">
           <MDBCard
             className="bg-white my-5 mx-auto"
-            style={{ borderRadius: "1rem", maxWidth: "500px" }}
+            style={{
+              borderRadius: "1rem",
+              maxWidth: "500px",
+              border: "8px solid #508bfc",
+            }}
           >
             <MDBCardBody className="p-5 w-100 d-flex flex-column">
               <h2 className="fw-bold mb-2 text-center">Логин</h2>
@@ -74,6 +76,7 @@ const Login = () => {
                 value={username}
                 placeholder="Введите ваше ФИО"
                 onChange={(event) => setUsername(event.target.value)}
+                style={{ border: "2px solid #ccc" }}
               />
               <MDBInput
                 wrapperClass="mb-4 w-100"
@@ -82,6 +85,7 @@ const Login = () => {
                 value={password}
                 placeholder="Введите пароль"
                 onChange={(event) => setPassword(event.target.value)}
+                style={{ border: "2px solid #ccc" }}
               />
 
               <Button
@@ -100,10 +104,10 @@ const Login = () => {
                 </a>
               </p>
 
-              <p className="text-center" style={{ marginTop: "-10px", marginBottom: "-35px"}}>
-              Вернуться на{" "}
+              <p className="text-center" style={{ marginTop: "-10px", marginBottom: "-35px" }}>
+                Вернуться на{" "}
                 <a href=" " onClick={() => navigate("/")}>
-                Главную
+                  Главную
                 </a>
               </p>
 

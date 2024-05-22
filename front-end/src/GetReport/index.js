@@ -296,7 +296,7 @@ const GetReport = () => {
       <Row className="mt-4">
         <Col>
           <div className="h1 d-flex justify-content-center align-items-center">
-            Отчёт: {report.name}
+            {report.name}
           </div>
         </Col>
       </Row>

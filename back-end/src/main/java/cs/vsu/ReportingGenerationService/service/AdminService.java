@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -38,9 +39,21 @@ public class AdminService {
 
     public Optional<List<Report>> getReports() {return Optional.ofNullable(reportRepository.findAll());}
 
-    public Optional<List<ReportRequest>> getReportRequests() {return Optional.ofNullable(reportRequestRepository.findAllByOrderByRequestTimeDesc());}
 
     public Optional<Report> getReportById(Long id) {return reportRepository.findById(id);}
+
+    public Optional<List<ReportRequest>> getReportRequests() {
+        List<ReportRequest> reportRequests = reportRequestRepository.findAllByOrderByRequestTimeDesc();
+        List<ReportRequest> modifiedReportRequests = reportRequests.stream()
+                .peek(reportRequest -> {
+                    Report modifiedReport = new Report();
+                    modifiedReport.setId(reportRequest.getReport().getId());
+                    modifiedReport.setName(reportRequest.getReport().getName());
+                    reportRequest.setReport(modifiedReport);
+                })
+                .collect(Collectors.toList());
+        return Optional.of(modifiedReportRequests);
+    }
 
     @Transactional
     public Optional<List<User>> approveAuthRequest(User user) {
