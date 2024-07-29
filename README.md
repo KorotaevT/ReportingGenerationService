@@ -9,4 +9,4 @@
 - Аутентификация: Spring Security
 - Развертывание: Docker
 - Документация: Swagger
-- Миграция бд: Flyway
+- Миграция БД: Flyway
