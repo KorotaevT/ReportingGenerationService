@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -33,11 +34,11 @@ public class ReportController {
     @GetMapping("/getReports")
     @Operation(summary = "Получить все отчеты", description = "Возвращает список всех отчетов")
     public ResponseEntity<List<Report>> getReports() {
-        List<Report> reportList = reportService.getReports().orElseThrow();
+        List<Report> reportList = reportService.getReports().orElseGet(ArrayList::new);
         return ResponseEntity.ok(reportList);
     }
 
-   @GetMapping("/getReportById/{id}")
+    @GetMapping("/getReportById/{id}")
    @Operation(summary = "Получить отчет по ID", description = "Возвращает отчет по заданному ID")
    public ResponseEntity<Report> getReportById(@PathVariable Long id) {
         Report report = reportService.getReportByIdWithNullSensitiveFields(id);

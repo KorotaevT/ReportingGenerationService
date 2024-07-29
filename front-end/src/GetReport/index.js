@@ -14,6 +14,8 @@ const GetReport = () => {
   const navigate = useNavigate();
   const navigateRef = useRef(navigate);
   const { id } = useParams();
+  const [fields, setFields] = useState([]);
+  const [reportData, setReportData] = useState(null);
 
   const [report, setReport] = useState({
     id: null,
@@ -24,8 +26,10 @@ const GetReport = () => {
     },
   });
 
-  const [fields, setFields] = useState([]);
-  const [reportData, setReportData] = useState(null);
+  const [dynamicFields, setDynamicFields] = useState({
+    departureAirport: "",
+    departureTime: "",
+  });
 
   useEffect(() => {
     userRef.current = user;
@@ -116,6 +120,7 @@ const GetReport = () => {
             fieldName: field.fieldName,
           })),
       },
+      dynamicFields,
     };
 
     ajax(`/api/data/getReportDataById`, "POST", user.jwt, reportData).then(
@@ -147,6 +152,7 @@ const GetReport = () => {
             fieldName: field.fieldName,
           })),
       },
+      dynamicFields,
     };
 
     ajax(`/api/data/downloadExcel`, "POST", user.jwt, reportData)
@@ -407,6 +413,55 @@ const GetReport = () => {
           </Table>
         </Col>
       </Row>
+      <Row className="mt-3">
+  <Col className="d-flex flex-column align-items-center">
+    <div className="create-report-label">Динамические поля:</div>
+    <Table bordered hover size="sm">
+      <thead>
+        <tr>
+          <th className="text-center">#</th>
+          <th className="text-center field-column">Поле</th>
+          <th className="text-center value-column">Значение</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td className="text-center">1</td>
+          <td className="text-left field-column">Аэропорт вылета</td>
+          <td className="text-center value-column">
+            <Form.Control
+              type="text"
+              value={dynamicFields.departureAirport}
+              onChange={(e) =>
+                setDynamicFields((prev) => ({
+                  ...prev,
+                  departureAirport: e.target.value,
+                }))
+              }
+            />
+          </td>
+        </tr>
+        <tr>
+          <td className="text-center">2</td>
+          <td className="text-left field-column">Время вылета</td>
+          <td className="text-center value-column">
+            <Form.Control
+              type="text"
+              value={dynamicFields.departureTime}
+              onChange={(e) =>
+                setDynamicFields((prev) => ({
+                  ...prev,
+                  departureTime: e.target.value,
+                }))
+              }
+            />
+          </td>
+        </tr>
+      </tbody>
+    </Table>
+  </Col>
+</Row>
+
       <Row className="mt-3 justify-content-center">
         <div className="d-flex justify-content-center mt-3">
           <Button

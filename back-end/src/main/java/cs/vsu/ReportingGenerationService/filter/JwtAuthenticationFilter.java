@@ -1,4 +1,4 @@
-package cs.vsu.ReportingGenerationService.filters;
+package cs.vsu.ReportingGenerationService.filter;
 
 import cs.vsu.ReportingGenerationService.service.JwtService;
 import jakarta.servlet.FilterChain;

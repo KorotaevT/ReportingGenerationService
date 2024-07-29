@@ -65,17 +65,15 @@ public class JwtService {
         return extractClaim(token, Claims::getExpiration);
     }
 
-    private Claims extractAllClaims(String token){
+    private Claims extractAllClaims(String token) {
         try {
-            return Jwts
-                    .parserBuilder()
+            return Jwts.parserBuilder()
                     .setSigningKey(getSignInKey())
                     .build()
                     .parseClaimsJws(token)
                     .getBody();
-        }catch (ExpiredJwtException | MalformedJwtException e) {
-            return Jwts
-                    .claims();
+        } catch (ExpiredJwtException | MalformedJwtException e) {
+            throw new RuntimeException("Недействительный JWT токен");
         }
     }
 

@@ -1,6 +1,6 @@
 package cs.vsu.ReportingGenerationService.config;
 
-import cs.vsu.ReportingGenerationService.filters.JwtAuthenticationFilter;
+import cs.vsu.ReportingGenerationService.filter.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

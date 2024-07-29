@@ -44,17 +44,21 @@ public class AuthenticationService {
     }
 
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.getUsername(),
-                        request.getPassword()));
-        var user =  repository.findByUsername(request.getUsername())
-                .orElseThrow();
-        var jwtToken = jwtService.generateToken(user);
-        return AuthenticationResponse.builder()
-                .token(jwtToken)
-                .user(user)
-                .build();
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            request.getUsername(),
+                            request.getPassword()));
+            var user = repository.findByUsername(request.getUsername())
+                    .orElseThrow(() -> new RuntimeException("Неверное имя пользователя или пароль"));
+            var jwtToken = jwtService.generateToken(user);
+            return AuthenticationResponse.builder()
+                    .token(jwtToken)
+                    .user(user)
+                    .build();
+        } catch (Exception e) {
+            throw new RuntimeException("Ошибка аутентификации: " + e.getMessage());
+        }
     }
 
 }

@@ -40,6 +40,7 @@ dependencies {
 	implementation("org.apache.poi:poi:4.1.2")
 	implementation("org.apache.poi:poi-ooxml:4.1.2")
 	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0")
+	implementation("org.flywaydb:flyway-core:9.1.1")
 }
 
 tasks.withType<Test> {

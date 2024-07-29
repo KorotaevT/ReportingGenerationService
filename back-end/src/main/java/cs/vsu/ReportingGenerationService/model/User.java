@@ -37,6 +37,7 @@ public class User implements UserDetails {
     private String password;
     @OneToMany(mappedBy = "user",fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JsonIgnore
+    @Builder.Default
     private List<Authority> authorities = new ArrayList<>();
 
     @OneToMany(mappedBy = "user")

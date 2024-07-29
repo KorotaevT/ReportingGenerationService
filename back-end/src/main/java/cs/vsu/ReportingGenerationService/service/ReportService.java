@@ -4,6 +4,8 @@ import cs.vsu.ReportingGenerationService.dao.DynamicTableReader;
 import cs.vsu.ReportingGenerationService.dto.FieldSelectionDTO;
 import cs.vsu.ReportingGenerationService.dto.ReportRequestDTO;
 import cs.vsu.ReportingGenerationService.dto.ReportResponseDTO;
+import cs.vsu.ReportingGenerationService.exception.ReportGenerationException;
+import cs.vsu.ReportingGenerationService.exception.ReportNotFoundException;
 import cs.vsu.ReportingGenerationService.model.Report;
 import cs.vsu.ReportingGenerationService.model.ReportRequest;
 import cs.vsu.ReportingGenerationService.model.User;
@@ -53,10 +55,9 @@ public class ReportService {
     }
 
     public Report getReportByIdWithNullSensitiveFields(Long id) {
-        Report report = reportRepository.findById(id).orElse(null);
-        if (report != null) {
-            nullifySensitiveFields(report);
-        }
+        Report report = reportRepository.findById(id)
+                .orElseThrow(() -> new ReportNotFoundException("Отчёт не найден по id: " + id));
+        nullifySensitiveFields(report);
         return report;
     }
 
@@ -85,7 +86,8 @@ public class ReportService {
         }
 
         String curJwt = token.substring(7);
-        User curUser = userRepository.findByUsername(jwtService.extractUsername(curJwt)).orElseThrow();
+        User curUser = userRepository.findByUsername(jwtService.extractUsername(curJwt))
+                .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
 
         ReportRequest curReportRequest = ReportRequest.builder()
                 .user(curUser)
@@ -106,88 +108,90 @@ public class ReportService {
     }
 
     public byte[] downloadExcel(ReportRequestDTO request, String token) throws IOException {
+        try {
+            ReportResponseDTO report = getReportDataById(request, token);
 
-        ReportResponseDTO report = getReportDataById(request, token);
+            Workbook workbook = new XSSFWorkbook();
+            Sheet sheet = workbook.createSheet("Отчёт");
 
-        Workbook workbook = new XSSFWorkbook();
-        Sheet sheet = workbook.createSheet("Отчёт");
+            int rowIndex = 0;
 
-        int rowIndex = 0;
+            for (FieldSelectionDTO fieldSelectionDTO : request.getFields().getOrDefault("fixed", Collections.emptyList())) {
 
-        for (FieldSelectionDTO fieldSelectionDTO : request.getFields().getOrDefault("fixed", Collections.emptyList())) {
-
-            if (Objects.equals(fieldSelectionDTO.getFieldName(), "Название отчета") && report.getReportName() != null) {
-                Row reportNameRow = sheet.createRow(rowIndex++);
-                reportNameRow.createCell(0).setCellValue("Название отчета:");
-                reportNameRow.createCell(1).setCellValue(report.getReportName());
-                continue;
-            }
-
-            if (Objects.equals(fieldSelectionDTO.getFieldName(), "Предоставитель отчета") && report.getReportProvider() != null) {
-                Row reportProviderRow = sheet.createRow(rowIndex++);
-                reportProviderRow.createCell(0).setCellValue("Предоставитель отчета:");
-                reportProviderRow.createCell(1).setCellValue(report.getReportProvider());
-                continue;
-            }
-
-            CellStyle dateCellStyle = workbook.createCellStyle();
-            CreationHelper createHelper = workbook.getCreationHelper();
-            dateCellStyle.setDataFormat(createHelper.createDataFormat().getFormat("dd.MM.yyyy"));
-
-            if (Objects.equals(fieldSelectionDTO.getFieldName(), "Дата") && report.getReportDate() != null) {
-                Row reportDateRow = sheet.createRow(rowIndex++);
-                reportDateRow.createCell(0).setCellValue("Дата отчета:");
-                Cell dateCell = reportDateRow.createCell(1);
-                dateCell.setCellValue(report.getReportDate());
-                dateCell.setCellStyle(dateCellStyle);
-                continue;
-            }
-
-            if (Objects.equals(fieldSelectionDTO.getFieldName(), "Количество записей") && report.getRecordCount() != -1) {
-                Row reportProviderRow = sheet.createRow(rowIndex++);
-                reportProviderRow.createCell(0).setCellValue("Количество записей:");
-                reportProviderRow.createCell(1).setCellValue(report.getRecordCount());
-                continue;
-            }
-
-            if (Objects.equals(fieldSelectionDTO.getFieldName(), "Названия полей") && report.isFieldNames() && report.getData() != null && !report.getData().isEmpty()) {
-                Row fieldNamesRow = sheet.createRow(rowIndex++);
-                int cellIndex = 0;
-                for (String fieldName : report.getData().get(0).keySet()) {
-                    fieldNamesRow.createCell(cellIndex++).setCellValue(fieldName);
+                if (Objects.equals(fieldSelectionDTO.getFieldName(), "Название отчета") && report.getReportName() != null) {
+                    Row reportNameRow = sheet.createRow(rowIndex++);
+                    reportNameRow.createCell(0).setCellValue("Название отчета:");
+                    reportNameRow.createCell(1).setCellValue(report.getReportName());
+                    continue;
                 }
-            }
-        }
 
-        if (report.getData() != null) {
-            for (Map<String, Object> rowData : report.getData()) {
-                Row row = sheet.createRow(rowIndex++);
-                int cellIndex = 0;
-                for (Object value : rowData.values()) {
-                    Cell cell = row.createCell(cellIndex++);
-                    if (value instanceof String) {
-                        cell.setCellValue((String) value);
-                    } else if (value instanceof Integer) {
-                        cell.setCellValue((Integer) value);
-                    } else if (value instanceof Double) {
-                        cell.setCellValue((Double) value);
-                    } else if (value instanceof Boolean) {
-                        cell.setCellValue((Boolean) value);
+                if (Objects.equals(fieldSelectionDTO.getFieldName(), "Предоставитель отчета") && report.getReportProvider() != null) {
+                    Row reportProviderRow = sheet.createRow(rowIndex++);
+                    reportProviderRow.createCell(0).setCellValue("Предоставитель отчета:");
+                    reportProviderRow.createCell(1).setCellValue(report.getReportProvider());
+                    continue;
+                }
+
+                CellStyle dateCellStyle = workbook.createCellStyle();
+                CreationHelper createHelper = workbook.getCreationHelper();
+                dateCellStyle.setDataFormat(createHelper.createDataFormat().getFormat("dd.MM.yyyy"));
+
+                if (Objects.equals(fieldSelectionDTO.getFieldName(), "Дата") && report.getReportDate() != null) {
+                    Row reportDateRow = sheet.createRow(rowIndex++);
+                    reportDateRow.createCell(0).setCellValue("Дата отчета:");
+                    Cell dateCell = reportDateRow.createCell(1);
+                    dateCell.setCellValue(report.getReportDate());
+                    dateCell.setCellStyle(dateCellStyle);
+                    continue;
+                }
+
+                if (Objects.equals(fieldSelectionDTO.getFieldName(), "Количество записей") && report.getRecordCount() != -1) {
+                    Row reportProviderRow = sheet.createRow(rowIndex++);
+                    reportProviderRow.createCell(0).setCellValue("Количество записей:");
+                    reportProviderRow.createCell(1).setCellValue(report.getRecordCount());
+                    continue;
+                }
+
+                if (Objects.equals(fieldSelectionDTO.getFieldName(), "Названия полей") && report.isFieldNames() && report.getData() != null && !report.getData().isEmpty()) {
+                    Row fieldNamesRow = sheet.createRow(rowIndex++);
+                    int cellIndex = 0;
+                    for (String fieldName : report.getData().get(0).keySet()) {
+                        fieldNamesRow.createCell(cellIndex++).setCellValue(fieldName);
                     }
                 }
             }
-        }
 
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        try {
-            workbook.write(outputStream);
-        } finally {
-            workbook.close();
-        }
+            if (report.getData() != null) {
+                for (Map<String, Object> rowData : report.getData()) {
+                    Row row = sheet.createRow(rowIndex++);
+                    int cellIndex = 0;
+                    for (Object value : rowData.values()) {
+                        Cell cell = row.createCell(cellIndex++);
+                        if (value instanceof String) {
+                            cell.setCellValue((String) value);
+                        } else if (value instanceof Integer) {
+                            cell.setCellValue((Integer) value);
+                        } else if (value instanceof Double) {
+                            cell.setCellValue((Double) value);
+                        } else if (value instanceof Boolean) {
+                            cell.setCellValue((Boolean) value);
+                        }
+                    }
+                }
+            }
 
-        return outputStream.toByteArray();
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            try {
+                workbook.write(outputStream);
+            } finally {
+                workbook.close();
+            }
+
+            return outputStream.toByteArray();
+        } catch (Exception e) {
+            throw new ReportGenerationException("Не удалось создать отчёт: " + e.getMessage());
+        }
     }
-
 
 
     private void nullifySensitiveFields(Report report) {
